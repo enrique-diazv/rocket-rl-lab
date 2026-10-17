@@ -39,11 +39,12 @@ npm --prefix frontend run build
 
 ## Estado actual
 
-- Instalación de Gymnasium, Box2D, Stable-Baselines3 y PyTorch comprobada.
-- Creación de LunarLander-v3 y ejecución de un paso comprobadas.
+- Dependencias del backend instaladas y comprobadas.
 - Plantilla React con TypeScript compilada.
-- Dependencias de FastAPI y pruebas instaladas.
-- API, entrenamiento y pruebas propias pendientes de implementar.
+- Ruta GET /api/health comprobada manualmente.
+- Creación del simulador centralizada en app/rl/env_factory.py.
+- Agente aleatorio ejecutado durante tres episodios con seeds definidas.
+- Entrenamiento PPO y conexión del frontend con la API pendientes.
 
 ## Archivos generados
 
