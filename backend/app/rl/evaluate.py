@@ -5,15 +5,23 @@ from stable_baselines3 import PPO
 
 from app.rl.env_factory import create_lander_env
 
+from argparse import ArgumentParser
 
 EVALUATION_SEEDS = tuple(range(1_000, 1_010))
 
 
 def main() -> None:
-    backend_directory = Path(__file__).resolve().parents[2]
-    checkpoint_path = (
-        backend_directory / "checkpoints" / "neutral_initial.zip"
+    parser = ArgumentParser(description="Evalúa un checkpoint PPO.")
+    parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        default=Path("checkpoints/neutral_initial.zip"),
     )
+    args = parser.parse_args()
+
+    backend_directory = Path(__file__).resolve().parents[2]
+    checkpoint_path = backend_directory / args.checkpoint
+    print(f"Checkpoint seleccionado: {checkpoint_path}")
 
     model = PPO.load(checkpoint_path, device="cpu")
     env = create_lander_env()

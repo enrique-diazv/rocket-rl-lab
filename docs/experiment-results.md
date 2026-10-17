@@ -46,3 +46,45 @@ con acciones deterministas. Las recompensas coincidieron con la evaluación:
 | 1000 | -367.69 |
 | 1001 | -281.72 |
 | 1002 | -393.75 |
+
+## Ensayo 002: PPO Neutral con mayor presupuesto
+
+### Configuración
+
+Se conservaron el entorno, las versiones, la arquitectura, la seed 42
+y los parámetros PPO del ensayo 001.
+
+- Modelo nuevo entrenado desde cero.
+- Pasos de entrenamiento: 1 024 000.
+- Checkpoint: backend/checkpoints/neutral_baseline.zip.
+- Recompensa media reciente de entrenamiento en el último log: 191.
+- Tiempo reportado en el último log: 1252 segundos.
+
+### Evaluación
+
+Diez episodios con las mismas seeds y acciones deterministas del ensayo 001.
+
+| Seed | Recompensa | Pasos |
+| --- | ---: | ---: |
+| 1000 | 263.58 | 331 |
+| 1001 | 238.34 | 256 |
+| 1002 | 238.39 | 335 |
+| 1003 | 264.07 | 322 |
+| 1004 | -9.46 | 327 |
+| 1005 | 220.18 | 266 |
+| 1006 | -11.10 | 305 |
+| 1007 | 229.04 | 254 |
+| 1008 | 249.50 | 297 |
+| 1009 | 209.43 | 271 |
+
+- Recompensa original media: 189.20.
+- Desviación estándar muestral: 106.54.
+- Episodios truncados: 0 de 10.
+
+### Interpretación y reproducción
+
+La media aumentó respecto al ensayo inicial, evaluado con las mismas seeds.
+Persisten dos episodios con recompensas negativas.
+
+La reproducción de las seeds 1000, 1004 y 1006 coincidió con las recompensas
+de evaluación. La clasificación explícita de aterrizajes sigue pendiente.

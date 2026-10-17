@@ -6,12 +6,14 @@ from stable_baselines3.common.monitor import Monitor
 from app.rl.env_factory import create_lander_env
 
 SEED = 42
-TOTAL_TIMESTEPS = 10_240
+TOTAL_TIMESTEPS = 1_024_000
 
 
 def main() -> None:
     backend_directory = Path(__file__).resolve().parents[2]
-    checkpoint_path = backend_directory / "checkpoints" / "neutral_initial.zip"
+    checkpoint_path = (
+        backend_directory / "checkpoints" / "neutral_baseline.zip"
+    )
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
     env = Monitor(create_lander_env())

@@ -44,9 +44,9 @@ npm --prefix frontend run build
 - Ruta GET /api/health comprobada manualmente.
 - Creación del simulador centralizada en app/rl/env_factory.py.
 - Agente aleatorio ejecutado durante tres episodios con seeds definidas.
-- PPO entrenado durante 10 240 pasos; checkpoint guardado y cargado.
-- Evaluación inicial de diez episodios registrada en docs/experiment-results.md.
-- Visualización del checkpoint mediante app.rl.play; recompensas reproducidas en tres seeds.
+- Checkpoints PPO de 10 240 y 1 024 000 pasos, guardados y cargados.
+- Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.
+- Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
 - Conexión del frontend con la API pendiente.
 
 ## Archivos generados
