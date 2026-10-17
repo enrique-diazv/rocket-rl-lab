@@ -4,6 +4,7 @@ from statistics import mean, stdev
 from stable_baselines3 import PPO
 
 from app.rl.env_factory import create_lander_env
+from app.rl.landing_metrics import is_successful_landing
 
 from argparse import ArgumentParser
 
@@ -26,7 +27,7 @@ def main() -> None:
     model = PPO.load(checkpoint_path, device="cpu")
     env = create_lander_env()
     episode_rewards: list[float] = []
-
+    successful_episodes = 0
     try:
         for seed in EVALUATION_SEEDS:
             observation, _ = env.reset(seed=seed)
@@ -40,16 +41,22 @@ def main() -> None:
                     observation,
                     deterministic=True,
                 )
-                observation, reward, terminated, truncated, _ = (
-                    env.step(action.item())
-                )
+                observation, reward, terminated, truncated, _ = env.step(action.item())
                 total_reward += float(reward)
                 steps += 1
 
+            success = is_successful_landing(
+                env,
+                terminated=terminated,
+                truncated=truncated,
+            )
+            successful_episodes += int(success)
             episode_rewards.append(total_reward)
+
             print(
                 f"Seed {seed}: recompensa={total_reward:.2f}, "
-                f"pasos={steps}, truncated={truncated}"
+                f"pasos={steps}, success={success}, "
+                f"truncated={truncated}"
             )
     finally:
         env.close()
@@ -57,6 +64,8 @@ def main() -> None:
     print(f"Episodios evaluados: {len(episode_rewards)}")
     print(f"Recompensa original media: {mean(episode_rewards):.2f}")
     print(f"Desviacion estandar: {stdev(episode_rewards):.2f}")
+    print(f"Aterrizajes exitosos: " f"{successful_episodes}/{len(episode_rewards)}")
+    print(f"Tasa de exito: " f"{successful_episodes / len(episode_rewards):.1%}")
 
 
 if __name__ == "__main__":

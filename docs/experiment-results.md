@@ -85,6 +85,23 @@ Diez episodios con las mismas seeds y acciones deterministas del ensayo 001.
 
 La media aumentó respecto al ensayo inicial, evaluado con las mismas seeds.
 Persisten dos episodios con recompensas negativas.
-
 La reproducción de las seeds 1000, 1004 y 1006 coincidió con las recompensas
-de evaluación. La clasificación explícita de aterrizajes sigue pendiente.
+de evaluación.
+
+### Clasificación física del aterrizaje
+
+Se considera exitoso un episodio terminado sin truncamiento, sin choque
+del cuerpo, con el cohete en reposo, ambas patas en contacto con el suelo
+y su centro horizontal dentro de los límites de la plataforma.
+
+- Aterrizajes exitosos: 6 de 10 (60 %).
+- Choques del cuerpo: seeds 1004 y 1006.
+- Reposo fuera de la plataforma: seeds 1007 y 1009.
+- Plataforma: intervalo horizontal [8, 12].
+
+Las seeds 1007 y 1009 superaron 200 puntos sin cumplir el criterio físico.
+La recompensa y la tasa de éxito representan métricas diferentes.
+
+Cuatro casos automatizados verifican el criterio: aterrizaje válido,
+choque, posición fuera de plataforma y truncamiento.
+Resultado: 4 pruebas aprobadas.

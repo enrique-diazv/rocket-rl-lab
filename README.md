@@ -47,6 +47,7 @@ npm --prefix frontend run build
 - Checkpoints PPO de 10 240 y 1 024 000 pasos, guardados y cargados.
 - Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.
 - Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
+- Clasificación física de aterrizajes y cuatro casos críticos cubiertos por pruebas automatizadas.
 - Conexión del frontend con la API pendiente.
 
 ## Archivos generados
