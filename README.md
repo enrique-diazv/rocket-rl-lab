@@ -46,6 +46,7 @@ npm --prefix frontend run build
 - Agente aleatorio ejecutado durante tres episodios con seeds definidas.
 - PPO entrenado durante 10 240 pasos; checkpoint guardado y cargado.
 - Evaluación inicial de diez episodios registrada en docs/experiment-results.md.
+- Visualización del checkpoint mediante app.rl.play; recompensas reproducidas en tres seeds.
 - Conexión del frontend con la API pendiente.
 
 ## Archivos generados

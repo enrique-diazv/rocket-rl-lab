@@ -35,3 +35,14 @@ El desempeño sigue siendo bajo y no demuestra aterrizajes consistentes.
 
 Esta ejecución es una comprobación inicial con entrenamiento breve.
 Todavía no se ha implementado una medición explícita de aterrizajes exitosos.
+
+### Reproducción del checkpoint
+
+El módulo app.rl.play cargó el checkpoint y reprodujo tres episodios
+con acciones deterministas. Las recompensas coincidieron con la evaluación:
+
+| Seed | Recompensa |
+| --- | ---: |
+| 1000 | -367.69 |
+| 1001 | -281.72 |
+| 1002 | -393.75 |
