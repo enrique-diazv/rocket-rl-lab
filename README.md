@@ -48,7 +48,31 @@ npm --prefix frontend run build
 - Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.
 - Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
 - Clasificación física de aterrizajes y cuatro casos críticos cubiertos por pruebas automatizadas.
-- Conexión del frontend con la API pendiente.
+- Frontend conectado con FastAPI mediante el proxy de Vite.
+- Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
+
+## Ejecutar en desarrollo
+
+Mantener ambos servidores activos en terminales separadas.
+
+### Backend
+
+Desde la carpeta backend:
+
+```powershell
+& .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+### Frontend
+
+Desde la carpeta frontend:
+
+```powershell
+npm run dev
+```
+
+Abrir http://127.0.0.1:5173 y pulsar «Comprobar conexión».
+El proxy de desarrollo reenvía las rutas /api a FastAPI en el puerto 8000.
 
 ## Archivos generados
 
