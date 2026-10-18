@@ -122,3 +122,15 @@ y las versiones de las bibliotecas.
 
 Se comprobó su recuperación mediante GET /api/rocket-ai/episodes/{episode_id}.
 Los archivos generados permanecen excluidos de Git.
+
+### Persistencia de evaluaciones
+
+Se repitió la evaluación de neutral_baseline con las seeds 1000–1009.
+Se conservaron la recompensa original media de 189.20 y los 6/10
+aterrizajes exitosos.
+
+Los resultados por episodio se guardaron en JSON junto con el hash
+del checkpoint, sus pasos de entrenamiento y las versiones utilizadas.
+
+Se verificaron por HTTP el listado filtrado por modelo y la recuperación
+del detalle completo de la evaluación.

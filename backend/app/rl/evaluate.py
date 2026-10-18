@@ -5,7 +5,8 @@ from stable_baselines3 import PPO
 
 from app.rl.env_factory import create_lander_env
 from app.rl.landing_metrics import is_successful_landing
-
+from app.rl.evaluation_metrics import EpisodeEvaluation
+from app.storage.evaluations import save_evaluation
 from argparse import ArgumentParser
 
 EVALUATION_SEEDS = tuple(range(1_000, 1_010))
@@ -27,6 +28,8 @@ def main() -> None:
     model = PPO.load(checkpoint_path, device="cpu")
     env = create_lander_env()
     episode_rewards: list[float] = []
+    episode_results: list[EpisodeEvaluation] = []
+
     successful_episodes = 0
     try:
         for seed in EVALUATION_SEEDS:
@@ -53,6 +56,17 @@ def main() -> None:
             successful_episodes += int(success)
             episode_rewards.append(total_reward)
 
+            episode_results.append(
+                EpisodeEvaluation(
+                    seed=seed,
+                    steps=steps,
+                    total_reward=total_reward,
+                    success=success,
+                    terminated=terminated,
+                    truncated=truncated,
+                )
+            )
+
             print(
                 f"Seed {seed}: recompensa={total_reward:.2f}, "
                 f"pasos={steps}, success={success}, "
@@ -66,6 +80,13 @@ def main() -> None:
     print(f"Desviacion estandar: {stdev(episode_rewards):.2f}")
     print(f"Aterrizajes exitosos: " f"{successful_episodes}/{len(episode_rewards)}")
     print(f"Tasa de exito: " f"{successful_episodes / len(episode_rewards):.1%}")
+
+    evaluation_path = save_evaluation(
+        episode_results,
+        checkpoint_path=checkpoint_path,
+        training_timesteps=int(model.num_timesteps),
+    )
+    print(f"Evaluacion guardada en: {evaluation_path}")
 
 
 if __name__ == "__main__":

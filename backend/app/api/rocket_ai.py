@@ -9,6 +9,11 @@ from app.storage.episodes import (
     get_episode_path,
     list_episodes,
 )
+from app.storage.evaluations import (
+    EvaluationSummary,
+    get_evaluation_path,
+    list_evaluations,
+)
 
 router = APIRouter(
     prefix="/api/rocket-ai",
@@ -39,3 +44,21 @@ def get_episodes(
     model_id: str = Query(min_length=1),
 ) -> list[EpisodeSummary]:
     return list_episodes(model_id=model_id)
+
+@router.get("/evaluations/{evaluation_id}", response_class=FileResponse)
+def get_evaluation(evaluation_id: UUID) -> FileResponse:
+    try:
+        path = get_evaluation_path(evaluation_id)
+    except FileNotFoundError as error:
+        raise HTTPException(
+            status_code=404,
+            detail="Evaluación no encontrada.",
+        ) from error
+
+    return FileResponse(path, media_type="application/json")
+
+@router.get("/evaluations")
+def get_evaluations(
+    model_id: str = Query(min_length=1),
+) -> list[EvaluationSummary]:
+    return list_evaluations(model_id=model_id)

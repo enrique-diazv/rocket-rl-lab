@@ -59,6 +59,8 @@ npm --prefix frontend run build
 - Descarga de trayectorias completas con validación mediante Zod e identificación del episodio y modelo.
 - Visualización en Canvas del terreno, plataforma y nave usando las coordenadas grabadas del simulador.
 - Reproducción según los FPS del episodio, con pausa, deslizador y reinicio al finalizar.
+- Persistencia de evaluaciones con resultados por episodio, pasos de entrenamiento, hash del checkpoint y versiones.
+- Consulta del listado de evaluaciones por modelo y recuperación de su detalle mediante la API.
 
 ## Ejecutar en desarrollo
 
