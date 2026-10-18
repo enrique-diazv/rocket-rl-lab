@@ -1,4 +1,9 @@
-import {episodeSummariesSchema, type EpisodeSummary,} from '../schemas/episodes'
+import {
+  episodeRecordSchema,
+  episodeSummariesSchema,
+  type EpisodeRecord,
+  type EpisodeSummary,
+} from '../schemas/episodes'
 
 export async function checkBackendHealth(): Promise<void> {
   const response = await fetch('/api/health', {
@@ -65,6 +70,38 @@ export async function getEpisodes(
 
   if (!parsed.success) {
     throw new Error('El listado de episodios tiene un formato inesperado.')
+  }
+
+  return parsed.data
+}
+
+export async function getEpisode(
+  episodeId: string,
+): Promise<EpisodeRecord> {
+  const response = await fetch(
+    `/api/rocket-ai/episodes/${encodeURIComponent(episodeId)}`,
+    { signal: AbortSignal.timeout(5000) },
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `El backend respondió con HTTP ${response.status}.`,
+    )
+  }
+
+  const data: unknown = await response.json()
+  const parsed = episodeRecordSchema.safeParse(data)
+
+  if (!parsed.success) {
+    throw new Error(
+      'La trayectoria del episodio tiene un formato inesperado.',
+    )
+  }
+
+  if (parsed.data.id !== episodeId) {
+    throw new Error(
+      'La trayectoria recibida no corresponde al episodio solicitado.',
+    )
   }
 
   return parsed.data

@@ -3,6 +3,7 @@ import { checkBackendHealth } from './services/api'
 import './App.css'
 import { ModelSelector } from './components/ModelSelector'
 import { EpisodeSelector } from './components/EpisodeSelector'
+import { EpisodePlayer } from './components/EpisodePlayer'
 
 function App() {
   const [message, setMessage] = useState('Conexión sin comprobar.')
@@ -57,6 +58,14 @@ function App() {
           modelId={selectedModelId}
           selectedId={selectedEpisodeId}
           onSelect={setSelectedEpisodeId}
+        />
+      )}
+
+      {selectedModelId && selectedEpisodeId && (
+        <EpisodePlayer
+          key={selectedEpisodeId}
+          episodeId={selectedEpisodeId}
+          modelId={selectedModelId}
         />
       )}
 

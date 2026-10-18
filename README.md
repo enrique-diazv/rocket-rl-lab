@@ -56,7 +56,9 @@ npm --prefix frontend run build
 - Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
 - Consulta de episodios guardados por modelo mediante `GET /api/rocket-ai/episodes`.
 - Selector de episodios en React con validación de las respuestas mediante Zod.
-
+- Descarga de trayectorias completas con validación mediante Zod e identificación del episodio y modelo.
+- Visualización en Canvas del terreno, plataforma y nave usando las coordenadas grabadas del simulador.
+- Reproducción según los FPS del episodio, con pausa, deslizador y reinicio al finalizar.
 
 ## Ejecutar en desarrollo
 
