@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { checkBackendHealth } from './services/api'
 import './App.css'
+import { ModelSelector } from './components/ModelSelector'
 
 function App() {
   const [message, setMessage] = useState('Conexión sin comprobar.')
   const [checking, setChecking] = useState(false)
+  const [selectedModelId, setSelectedModelId] = useState('')
 
   async function handleCheckConnection() {
     setChecking(true)
@@ -38,6 +40,12 @@ function App() {
       >
         {checking ? 'Comprobando...' : 'Comprobar conexión'}
       </button>
+
+      <ModelSelector
+        selectedId={selectedModelId}
+        onSelect={setSelectedModelId}
+      />
+
     </main>
   )
 }

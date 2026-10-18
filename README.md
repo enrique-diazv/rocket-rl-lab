@@ -49,6 +49,8 @@ npm --prefix frontend run build
 - Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
 - Clasificación física de aterrizajes y cuatro casos críticos cubiertos por pruebas automatizadas.
 - Frontend conectado con FastAPI mediante el proxy de Vite.
+- Inventario de checkpoints locales disponible en GET /api/rocket-ai/models.
+- Selector de modelos en React con carga, validación de respuestas y manejo de errores.
 - Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
 
 ## Ejecutar en desarrollo
