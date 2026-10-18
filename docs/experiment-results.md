@@ -105,3 +105,20 @@ La recompensa y la tasa de éxito representan métricas diferentes.
 Cuatro casos automatizados verifican el criterio: aterrizaje válido,
 choque, posición fuera de plataforma y truncamiento.
 Resultado: 4 pruebas aprobadas.
+
+### Registro de trayectoria
+
+Se registró el episodio del checkpoint neutral_baseline con seed 1000.
+
+- Pasos: 331.
+- Fotogramas: 332, incluyendo el estado inicial.
+- Frecuencia de simulación: 50 FPS.
+- Recompensa original: 263.58.
+- Aterrizaje exitoso según el criterio físico: sí.
+
+La trayectoria contiene la geometría del cohete, las patas y el escenario.
+Se guarda como JSON junto con un UUID, el hash SHA-256 del checkpoint
+y las versiones de las bibliotecas.
+
+Se comprobó su recuperación mediante GET /api/rocket-ai/episodes/{episode_id}.
+Los archivos generados permanecen excluidos de Git.

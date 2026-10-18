@@ -51,6 +51,8 @@ npm --prefix frontend run build
 - Frontend conectado con FastAPI mediante el proxy de Vite.
 - Inventario de checkpoints locales disponible en GET /api/rocket-ai/models.
 - Selector de modelos en React con carga, validación de respuestas y manejo de errores.
+- Grabación de trayectorias físicas y persistencia en JSON con identificación del checkpoint y versiones.
+- Recuperación de episodios guardados mediante GET /api/rocket-ai/episodes/{episode_id}.
 - Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
 
 ## Ejecutar en desarrollo
