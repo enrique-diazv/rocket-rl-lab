@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { checkBackendHealth } from './services/api'
 import './App.css'
 import { ModelSelector } from './components/ModelSelector'
+import { EpisodeSelector } from './components/EpisodeSelector'
 
 function App() {
   const [message, setMessage] = useState('Conexión sin comprobar.')
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState('')
   const [checking, setChecking] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState('')
 
@@ -43,8 +45,20 @@ function App() {
 
       <ModelSelector
         selectedId={selectedModelId}
-        onSelect={setSelectedModelId}
+        onSelect={(modelId) => {
+          setSelectedModelId(modelId)
+          setSelectedEpisodeId('')
+        }}
       />
+
+      {selectedModelId && (
+        <EpisodeSelector
+          key={selectedModelId}
+          modelId={selectedModelId}
+          selectedId={selectedEpisodeId}
+          onSelect={setSelectedEpisodeId}
+        />
+      )}
 
     </main>
   )

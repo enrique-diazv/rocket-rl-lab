@@ -1,4 +1,4 @@
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from hashlib import sha256
 from importlib.metadata import version
 import json
@@ -58,3 +58,37 @@ def get_episode_path(episode_id: UUID) -> Path:
         raise FileNotFoundError("El episodio solicitado no existe.")
 
     return path
+
+
+@dataclass(frozen=True)
+class EpisodeSummary:
+    id: str
+    model_id: str
+    seed: int
+    steps: int
+    total_reward: float
+    success: bool
+
+
+def list_episodes(*, model_id: str) -> list[EpisodeSummary]:
+    episodes: list[EpisodeSummary] = []
+
+    for path in sorted(EPISODE_DIRECTORY.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+
+        if payload["model_id"] != model_id:
+            continue
+
+        episode = payload["episode"]
+        episodes.append(
+            EpisodeSummary(
+                id=payload["id"],
+                model_id=payload["model_id"],
+                seed=episode["seed"],
+                steps=episode["steps"],
+                total_reward=episode["total_reward"],
+                success=episode["success"],
+            )
+        )
+
+    return episodes

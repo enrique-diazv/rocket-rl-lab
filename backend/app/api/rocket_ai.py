@@ -1,11 +1,14 @@
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from app.storage.checkpoints import CheckpointSummary, list_checkpoints
-from app.storage.episodes import get_episode_path
-
+from app.storage.episodes import (
+    EpisodeSummary,
+    get_episode_path,
+    list_episodes,
+)
 
 router = APIRouter(
     prefix="/api/rocket-ai",
@@ -29,3 +32,10 @@ def get_episode(episode_id: UUID) -> FileResponse:
         ) from error
 
     return FileResponse(path, media_type="application/json")
+
+
+@router.get("/episodes")
+def get_episodes(
+    model_id: str = Query(min_length=1),
+) -> list[EpisodeSummary]:
+    return list_episodes(model_id=model_id)

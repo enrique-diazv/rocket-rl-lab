@@ -54,6 +54,9 @@ npm --prefix frontend run build
 - Grabación de trayectorias físicas y persistencia en JSON con identificación del checkpoint y versiones.
 - Recuperación de episodios guardados mediante GET /api/rocket-ai/episodes/{episode_id}.
 - Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
+- Consulta de episodios guardados por modelo mediante `GET /api/rocket-ai/episodes`.
+- Selector de episodios en React con validación de las respuestas mediante Zod.
+
 
 ## Ejecutar en desarrollo
 
