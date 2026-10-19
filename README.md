@@ -61,6 +61,9 @@ npm --prefix frontend run build
 - Reproducción según los FPS del episodio, con pausa, deslizador y reinicio al finalizar.
 - Persistencia de evaluaciones con resultados por episodio, pasos de entrenamiento, hash del checkpoint y versiones.
 - Consulta del listado de evaluaciones por modelo y recuperación de su detalle mediante la API.
+- Selección de evaluaciones por modelo y visualización de sus métricas con validación de datos mediante Zod.
+- Gráficas de recompensa original y duración por seed, y porcentaje de aterrizajes exitosos y no exitosos.
+- Carga de las gráficas bajo demanda mediante React.lazy y Suspense.
 
 ## Ejecutar en desarrollo
 

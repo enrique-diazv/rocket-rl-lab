@@ -4,12 +4,15 @@ import './App.css'
 import { ModelSelector } from './components/ModelSelector'
 import { EpisodeSelector } from './components/EpisodeSelector'
 import { EpisodePlayer } from './components/EpisodePlayer'
+import { EvaluationSelector } from './components/EvaluationSelector'
+import { EvaluationResults } from './components/EvaluationResults'
 
 function App() {
   const [message, setMessage] = useState('Conexión sin comprobar.')
   const [selectedEpisodeId, setSelectedEpisodeId] = useState('')
   const [checking, setChecking] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState('')
+  const [selectedEvaluationId, setSelectedEvaluationId] = useState('')
 
   async function handleCheckConnection() {
     setChecking(true)
@@ -49,8 +52,26 @@ function App() {
         onSelect={(modelId) => {
           setSelectedModelId(modelId)
           setSelectedEpisodeId('')
+          setSelectedEvaluationId('')
         }}
       />
+
+      {selectedModelId && (
+        <EvaluationSelector
+          key={`evaluations-${selectedModelId}`}
+          modelId={selectedModelId}
+          selectedId={selectedEvaluationId}
+          onSelect={setSelectedEvaluationId}
+        />
+      )}
+
+      {selectedModelId && selectedEvaluationId && (
+        <EvaluationResults
+          key={`results-${selectedEvaluationId}`}
+          evaluationId={selectedEvaluationId}
+          modelId={selectedModelId}
+        />
+      )}
 
       {selectedModelId && (
         <EpisodeSelector

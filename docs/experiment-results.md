@@ -134,3 +134,16 @@ del checkpoint, sus pasos de entrenamiento y las versiones utilizadas.
 
 Se verificaron por HTTP el listado filtrado por modelo y la recuperación
 del detalle completo de la evaluación.
+
+### Visualización de la evaluación
+
+Se verificó en la interfaz la evaluación de neutral_baseline:
+10 episodios, recompensa original media de 189.20 y 6/10
+aterrizajes exitosos.
+
+Las gráficas muestran la recompensa original y la duración por seed,
+junto con un 60 % de episodios exitosos y un 40 % no exitosos.
+Corresponden a los diez episodios evaluados del checkpoint.
+
+Las comprobaciones de lint y compilación del frontend finalizaron
+correctamente.
