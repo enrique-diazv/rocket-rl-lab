@@ -165,3 +165,43 @@ Se reevaluó neutral_baseline con las seeds 1000–1009:
 
 Las recompensas mostradas, los pasos y las clasificaciones coincidieron
 con la evaluación anterior.
+
+## Ensayo 003: validación del entrenamiento con penalización temporal
+
+### Configuración
+
+- Modelo nuevo entrenado desde cero, usando CPU.
+- Seed: 42.
+- Pasos entrenados: 10 240.
+- Penalización temporal: 0.05 por paso.
+- Arquitectura: [64, 64].
+- Pasos por bloque: 2048.
+- Tamaño de minibatch: 64.
+- NumPy: 2.3.5.
+- Checkpoint: backend/checkpoints/neutral_time_penalty_smoke.zip.
+- Identificador del entrenamiento: 9dc9eae83fe54a22b6ecd9bb7dc7c569.
+
+Se verificaron config.json, progress.csv y episodes.monitor.csv.
+El último registro de recompensa media de entrenamiento fue -150.88,
+incluyendo la penalización temporal.
+
+### Evaluación con recompensa original
+
+- Seeds: 1000–1009, con acciones deterministas.
+- Recompensa original media: -470.19.
+- Desviación estándar muestral: 309.25.
+- Aterrizajes exitosos: 0/10.
+- Episodios truncados: 0/10.
+- Identificador de evaluación: 481a91ef4fe749e69df7d7f428e4a9b5.
+
+El objetivo de este ensayo fue comprobar entrenamiento, registro,
+guardado y carga del modelo. La comparación del efecto de la penalización
+utilizará el mismo presupuesto y dependencias para ambos modelos.
+
+### Dependencia gráfica
+
+Durante el entrenamiento apareció un bloqueo de pygame.pixelcopy
+con pygame-ce 2.5.8. Después se instaló pygame-ce 2.5.6 y se verificó
+su importación, manteniendo Smart App Control activo.
+
+La comprobación final terminó con seis pruebas aprobadas.

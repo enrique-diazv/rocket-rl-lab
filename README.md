@@ -65,7 +65,9 @@ npm --prefix frontend run build
 - Gráficas de recompensa original y duración por seed, y porcentaje de aterrizajes exitosos y no exitosos.
 - Carga de las gráficas bajo demanda mediante React.lazy y Suspense.
 - Wrapper de penalización temporal configurable, con registro separado de recompensa original, adicional y total, validado mediante dos pruebas de integración.
-- Entorno local verificado con NumPy 2.3.5 y Smart App Control activo.
+- Entorno local verificado con NumPy 2.3.5, pygame-ce 2.5.6 y Smart App Control activo.
+- Entrenamiento configurable por consola, con protección contra sobrescritura de checkpoints.
+- Registro de configuración y versiones en JSON, y métricas de entrenamiento y episodios en CSV.
 
 ## Ejecutar en desarrollo
 
@@ -89,6 +91,28 @@ npm run dev
 
 Abrir http://127.0.0.1:5173 y pulsar «Comprobar conexión».
 El proxy de desarrollo reenvía las rutas /api a FastAPI en el puerto 8000.
+
+## Entrenamiento por consola
+
+Desde la carpeta backend, utilizando un nombre de checkpoint nuevo:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.train --checkpoint checkpoints/mi_experimento.zip --timesteps 10240 --time-penalty 0.05
+```
+
+Los pasos deben ser positivos y múltiplos de 2048.
+Una penalización de 0 conserva la recompensa original; un valor positivo
+resta ese costo en cada paso.
+
+Cada ensayo guarda configuración y métricas en
+backend/experiments/training/<id>.
+Las recompensas de entrenamiento incluyen el shaping.
+
+Para evaluar el modelo con la recompensa original:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.evaluate --checkpoint checkpoints/mi_experimento.zip
+```
 
 ## Archivos generados
 
