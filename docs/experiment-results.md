@@ -147,3 +147,21 @@ Corresponden a los diez episodios evaluados del checkpoint.
 
 Las comprobaciones de lint y compilación del frontend finalizaron
 correctamente.
+
+## Verificación del entorno y del wrapper temporal
+
+Smart App Control bloqueó una extensión nativa de NumPy 2.5.4.
+Se instaló NumPy 2.3.5 manteniendo esa protección activa.
+
+Pasaron seis pruebas: cuatro de clasificación de aterrizajes y dos
+de integración del wrapper, con penalizaciones temporales de 0 y 0.05.
+Estas últimas verifican que se conservan las observaciones, las condiciones
+de finalización y el acceso a la recompensa original.
+
+Se reevaluó neutral_baseline con las seeds 1000–1009:
+- Recompensa original media: 189.20.
+- Desviación estándar muestral: 106.54.
+- Aterrizajes exitosos: 6/10.
+
+Las recompensas mostradas, los pasos y las clasificaciones coincidieron
+con la evaluación anterior.

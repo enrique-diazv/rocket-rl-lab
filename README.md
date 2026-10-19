@@ -64,6 +64,8 @@ npm --prefix frontend run build
 - Selección de evaluaciones por modelo y visualización de sus métricas con validación de datos mediante Zod.
 - Gráficas de recompensa original y duración por seed, y porcentaje de aterrizajes exitosos y no exitosos.
 - Carga de las gráficas bajo demanda mediante React.lazy y Suspense.
+- Wrapper de penalización temporal configurable, con registro separado de recompensa original, adicional y total, validado mediante dos pruebas de integración.
+- Entorno local verificado con NumPy 2.3.5 y Smart App Control activo.
 
 ## Ejecutar en desarrollo
 
