@@ -214,3 +214,49 @@ La comprobación final terminó con seis pruebas aprobadas.
 - La penalización acumulada corresponde a `-0.05 × pasos`; el retorno total coincide con la suma de sus componentes.
 - Las pruebas del wrapper verifican los acumuladores durante dos episodios consecutivos.
 - Esta ejecución valida el registro; no permite concluir si la penalización mejora el aprendizaje.
+
+## Comparación controlada: referencia y penalización temporal
+
+Ambos modelos se entrenaron desde cero durante 1.024.000 pasos, con
+semilla 42, la misma configuración de PPO y las mismas versiones de
+dependencias. La evaluación utiliza recompensa original, política
+determinista y semillas 1000 a 1009.
+
+| Métrica | Referencia | Penalización de 0.05 por paso |
+| --- | ---: | ---: |
+| Recompensa original media | 189.20 | 252.90 |
+| Desviación estándar | 106.54 | 24.80 |
+| Aterrizajes exitosos | 6/10 | 10/10 |
+| Tasa de éxito | 60 % | 100 % |
+| Pasos medios por episodio | 296.4 | 333.4 |
+
+### Corrección de la métrica de aterrizaje
+
+Los indicadores `ground_contact` de Gymnasium produjeron cuatro falsos
+negativos en el modelo con penalización: las patas conservaban contactos
+físicos activos aunque sus indicadores estuvieran en False.
+
+La métrica ahora consulta los contactos activos de Box2D con el terreno.
+Conserva los requisitos de ambas patas apoyadas, ausencia de choque,
+cuerpo en reposo, centro dentro de la plataforma y final sin truncamiento.
+
+Las pruebas incluyen apoyo físico con indicadores incorrectos y rechazo
+cuando solamente una pata tiene contacto.
+
+### Registros
+
+- Referencia: `neutral_baseline_logged.zip`.
+- Entrenamiento de referencia: `bc5fb6334f8f4f8c8d8240879bd3e756`.
+- Evaluación corregida de referencia: `a5d9db38c06d45ba9e46a3a29316fb45`.
+- Penalización: `neutral_time_penalty.zip`.
+- Entrenamiento con penalización: `f5c3c85412d946309d59b1d2639066df`.
+- Evaluación corregida con penalización: `ca0ca51ef20a44978f654d378c8fc746`.
+- La evaluación anterior `c169b65639f1470d8a37d66fe73fdc38`
+  subestimaba el éxito; se conserva como antecedente.
+
+### Interpretación
+
+En estas diez semillas, la penalización obtuvo mayor recompensa y más
+aterrizajes exitosos, pero no redujo la duración media de los episodios.
+La comparación utiliza una sola semilla de entrenamiento por configuración;
+el 100 % observado no garantiza éxito en otros escenarios o semillas.

@@ -68,6 +68,7 @@ npm --prefix frontend run build
 - Entorno local verificado con NumPy 2.3.5, pygame-ce 2.5.6 y Smart App Control activo.
 - Entrenamiento configurable por consola, con protección contra sobrescritura de checkpoints.
 - Registro de configuración y versiones en JSON, y métricas en CSV con retornos original, adicional y total separados por episodio.
+- Métrica de aterrizaje basada en contactos físicos activos de Box2D, con pruebas de regresión y comparación documentada entre referencia y penalización temporal.
 
 ## Ejecutar en desarrollo
 
