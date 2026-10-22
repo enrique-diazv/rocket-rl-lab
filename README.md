@@ -67,7 +67,7 @@ npm --prefix frontend run build
 - Wrapper de penalización temporal configurable, con registro separado de recompensa original, adicional y total, validado mediante dos pruebas de integración.
 - Entorno local verificado con NumPy 2.3.5, pygame-ce 2.5.6 y Smart App Control activo.
 - Entrenamiento configurable por consola, con protección contra sobrescritura de checkpoints.
-- Registro de configuración y versiones en JSON, y métricas de entrenamiento y episodios en CSV.
+- Registro de configuración y versiones en JSON, y métricas en CSV con retornos original, adicional y total separados por episodio.
 
 ## Ejecutar en desarrollo
 

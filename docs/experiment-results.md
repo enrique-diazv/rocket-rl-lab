@@ -205,3 +205,12 @@ con pygame-ce 2.5.8. Después se instaló pygame-ce 2.5.6 y se verificó
 su importación, manteniendo Smart App Control activo.
 
 La comprobación final terminó con seis pruebas aprobadas.
+
+## Verificación del registro de retornos por episodio
+
+- Experimento: `967eafd99f8a492f9efab49c46113209`.
+- Entrenamiento técnico de 2.048 pasos con penalización temporal de 0.05.
+- Se verificaron las columnas `base_return`, `shaping_return` y `total_return` en `episodes.monitor.csv`.
+- La penalización acumulada corresponde a `-0.05 × pasos`; el retorno total coincide con la suma de sus componentes.
+- Las pruebas del wrapper verifican los acumuladores durante dos episodios consecutivos.
+- Esta ejecución valida el registro; no permite concluir si la penalización mejora el aprendizaje.

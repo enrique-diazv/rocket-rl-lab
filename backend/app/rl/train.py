@@ -72,6 +72,11 @@ def main() -> None:
         env = Monitor(
             env,
             filename=str(run_directory / "episodes.monitor.csv"),
+            info_keywords=(
+                "base_return",
+                "shaping_return",
+                "total_return",
+            ),
         )
 
         print(f"Penalizacion por paso: {args.time_penalty}")

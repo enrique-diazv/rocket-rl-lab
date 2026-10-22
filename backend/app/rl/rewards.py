@@ -19,6 +19,23 @@ class RewardShapingWrapper(gym.Wrapper):
 
         super().__init__(env)
         self.time_penalty = float(time_penalty)
+        self._base_return = 0.0
+        self._shaping_return = 0.0
+        self._total_return = 0.0
+
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, dict[str, Any]]:
+        observation, info = self.env.reset(seed=seed, options=options)
+
+        self._base_return = 0.0
+        self._shaping_return = 0.0
+        self._total_return = 0.0
+
+        return observation, info
 
     def step(
         self,
@@ -30,6 +47,10 @@ class RewardShapingWrapper(gym.Wrapper):
         shaping_reward = -self.time_penalty
         total_reward = base_reward + shaping_reward
 
+        self._base_return += base_reward
+        self._shaping_return += shaping_reward
+        self._total_return += total_reward
+
         info = {
             **info,
             "reward_components": {
@@ -38,5 +59,14 @@ class RewardShapingWrapper(gym.Wrapper):
                 "total": total_reward,
             },
         }
+
+        if terminated or truncated:
+            info.update(
+                {
+                    "base_return": self._base_return,
+                    "shaping_return": self._shaping_return,
+                    "total_return": self._total_return,
+                }
+            )
 
         return observation, total_reward, terminated, truncated, info
