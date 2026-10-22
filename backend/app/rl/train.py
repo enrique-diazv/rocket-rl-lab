@@ -5,7 +5,11 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 
 from app.rl.env_factory import create_lander_env
-from app.rl.rewards import RewardShapingWrapper
+from app.rl.rewards import (
+    HOVER_MAX_ANGLE,
+    HOVER_MAX_SPEED,
+    RewardShapingWrapper,
+)
 
 from stable_baselines3.common.logger import Logger, configure
 from app.storage.training import create_training_run
@@ -17,11 +21,12 @@ ROLLOUT_STEPS = 2_048
 
 def main() -> None:
     parser = ArgumentParser(
-        description="Entrena un PPO nuevo con penalización temporal."
+        description="Entrena un PPO nuevo con reward shaping configurable."
     )
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--timesteps", type=int, default=TOTAL_TIMESTEPS)
     parser.add_argument("--time-penalty", type=float, default=0.0)
+    parser.add_argument("--hover-bonus", type=float, default=0.0)
     args = parser.parse_args()
 
     if args.timesteps <= 0 or args.timesteps % ROLLOUT_STEPS != 0:
@@ -44,6 +49,7 @@ def main() -> None:
         env = RewardShapingWrapper(
             env,
             time_penalty=args.time_penalty,
+            hover_bonus=args.hover_bonus,
         )
 
         ppo_config = {
@@ -62,8 +68,15 @@ def main() -> None:
                 "checkpoint_path": str(checkpoint_path),
                 "requested_timesteps": args.timesteps,
                 "reward": {
-                    "mode": ("baseline" if args.time_penalty == 0 else "time_penalty"),
+                    "mode": (
+                        "shaped"
+                        if args.time_penalty > 0 or args.hover_bonus > 0
+                        else "baseline"
+                    ),
                     "time_penalty": args.time_penalty,
+                    "hover_bonus": args.hover_bonus,
+                    "hover_max_angle_radians": HOVER_MAX_ANGLE,
+                    "hover_max_normalized_speed": HOVER_MAX_SPEED,
                 },
                 "ppo": ppo_config,
             }
@@ -80,6 +93,7 @@ def main() -> None:
         )
 
         print(f"Penalizacion por paso: {args.time_penalty}")
+        print(f"Premio por paso estable: {args.hover_bonus}")
         print(f"Checkpoint de salida: {checkpoint_path}")
 
         model = PPO(env=env, **ppo_config)

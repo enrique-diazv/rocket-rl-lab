@@ -260,3 +260,50 @@ En estas diez semillas, la penalización obtuvo mayor recompensa y más
 aterrizajes exitosos, pero no redujo la duración media de los episodios.
 La comparación utiliza una sola semilla de entrenamiento por configuración;
 el 100 % observado no garantiza éxito en otros escenarios o semillas.
+
+## Reward hacking: premio por estabilidad sin progreso
+
+### Configuración
+
+- Checkpoint: `neutral_hover_bonus.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Misma configuración de PPO que las comparaciones anteriores.
+- Premio: +1 por paso con inclinación absoluta <= 0.1 radianes
+  y norma de velocidad de la observación <= 0.2.
+- Sin penalización temporal.
+- El premio exige estabilidad, pero no progreso hacia el aterrizaje.
+- Entrenamiento: `d3af15affe3a4f009ebad4f4d069fb58`.
+
+### Resultados
+
+Último registro de entrenamiento, con el premio adicional incluido:
+
+- Recompensa media de episodios: aproximadamente 762.
+- Duración media de episodios: aproximadamente 914 pasos.
+
+Evaluación con recompensa original y semillas 1000 a 1009:
+
+- Recompensa media: -39.90.
+- Desviación estándar: 23.85.
+- Aterrizajes exitosos: 0/10.
+- Los diez episodios alcanzaron el límite de 1.000 pasos.
+- Evaluación: `0d6b3f97336349318584674161f9027a`.
+
+### Evidencia del comportamiento
+
+En la seed 1000, los últimos 500 pasos transcurrieron sin contacto
+físico de las patas con el terreno. La altura del cuerpo respecto
+a la plataforma estuvo entre 1.823 y 4.834 unidades del mundo.
+
+- Recompensa original de ese episodio: -62.65.
+- Replay: `844a1b67b89a4a098e5c2533a5bb6ba9`.
+
+### Interpretación
+
+El premio permite acumular recompensa por permanecer estable sin
+aterrizar. La política aprendida prolonga el vuelo y agota el tiempo:
+la recompensa diseñada favorece un comportamiento distinto del objetivo.
+
+Este resultado corresponde a una ejecución de entrenamiento.
+La siguiente comparación sustituirá el premio por permanencia por
+una señal de progreso y un costo temporal.
