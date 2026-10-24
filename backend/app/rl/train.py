@@ -1,10 +1,11 @@
 from argparse import ArgumentParser
 from pathlib import Path
-
+from dataclasses import asdict
 from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 
 from app.rl.env_factory import create_lander_env
+from app.rl.agent_profiles import AGENT_PROFILES, RewardWeights
 from app.rl.rewards import (
     ENGINE_COST_BY_ACTION,
     HOVER_MAX_ANGLE,
@@ -26,13 +27,25 @@ def main() -> None:
     )
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--timesteps", type=int, default=TOTAL_TIMESTEPS)
-    parser.add_argument("--time-penalty", type=float, default=0.0)
-    parser.add_argument("--hover-bonus", type=float, default=0.0)
-    parser.add_argument("--progress-weight", type=float, default=0.0)
-    parser.add_argument("--horizontal-progress-weight", type=float, default=0.0)
-    parser.add_argument("--fuel-penalty", type=float, default=0.0)
-    parser.add_argument("--stability-penalty", type=float, default=0.0)
+    parser.add_argument("--time-penalty", type=float, default=None)
+    parser.add_argument("--hover-bonus", type=float, default=None)
+    parser.add_argument("--progress-weight", type=float, default=None)
+    parser.add_argument("--horizontal-progress-weight", type=float, default=None)
+    parser.add_argument("--fuel-penalty", type=float, default=None)
+    parser.add_argument("--stability-penalty", type=float, default=None)
+    parser.add_argument(
+        "--agent",
+        choices=sorted(AGENT_PROFILES),
+        help="Perfil inicial de recompensas de una especialidad.",
+    )
     args = parser.parse_args()
+
+    profile_weights = (
+        AGENT_PROFILES[args.agent] if args.agent is not None else RewardWeights()
+    )
+    for weight_name, default_weight in asdict(profile_weights).items():
+        if getattr(args, weight_name) is None:
+            setattr(args, weight_name, default_weight)
 
     if args.timesteps <= 0 or args.timesteps % ROLLOUT_STEPS != 0:
         parser.error(f"--timesteps debe ser positivo y múltiplo de {ROLLOUT_STEPS}.")
@@ -74,6 +87,7 @@ def main() -> None:
         run_directory = create_training_run(
             {
                 "environment_id": "LunarLander-v3",
+                "agent_profile": args.agent,
                 "checkpoint_path": str(checkpoint_path),
                 "requested_timesteps": args.timesteps,
                 "reward": {

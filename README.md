@@ -116,6 +116,17 @@ y `--stability-penalty 0` se conserva la recompensa original.
 - `--horizontal-progress-weight` pondera la reducción del error horizontal respecto al centro: `abs(x anterior) - abs(x actual)`. Acercarse suma, alejarse resta y mantener el mismo error aporta cero.
 - `--fuel-penalty` multiplica un costo adicional por uso de motores: `0` sin propulsión, `0.03` para un lateral y `0.30` para el principal. Estos costos relativos no representan un tanque de combustible finito.
 - `--stability-penalty` multiplica un costo por paso calculado como la suma de cuadrados de las velocidades horizontal y vertical, la inclinación y el giro de la observación (`observation[2:6]`). Las velocidades utilizan las escalas de Gymnasium.
+`--agent` selecciona un perfil inicial: `precision`, `speed`,
+`efficiency`, `stability` o `balanced`. Sus pesos se definen en
+`backend/app/rl/agent_profiles.py`.
+
+Los parámetros de recompensa proporcionados explícitamente reemplazan
+los valores del perfil, incluso cuando su valor es cero.
+Sin `--agent`, los pesos omitidos se resuelven a cero.
+
+Cada experimento registra el perfil seleccionado en `agent_profile`
+y los pesos efectivos en `reward`. Los perfiles son configuraciones
+exploratorias; sus nombres no demuestran comportamientos aprendidos.
 
 Cada ensayo guarda configuración y métricas en
 backend/experiments/training/<id>.

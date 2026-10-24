@@ -416,3 +416,19 @@ La ejecución completó el presupuesto y guardó el checkpoint,
 la configuración y las métricas. Esta comprobación valida la integración;
 todavía no demuestra una mejora en la estabilidad de los aterrizajes.
 No se realizó una evaluación de rendimiento de este checkpoint.
+
+## Perfiles: integración y prioridad de parámetros
+
+- Checkpoint: `balanced_profile_smoke.zip`.
+- Entrenamiento desde cero: 2.048 pasos, semilla 42.
+- Perfil inicial: `balanced`.
+- Sobrescritura explícita: `--fuel-penalty 0`.
+- Pesos efectivos: tiempo 0.05, progreso euclidiano 5,
+  progreso horizontal 5, combustible 0 e inestabilidad 0.05.
+- Premio por estabilidad deshabilitado.
+- Entrenamiento: `eec46eebf5c543cabb3b4eebba129fc3`.
+
+La ejecución confirmó que el perfil aporta los valores iniciales
+y que un cero explícito reemplaza el costo de combustible del perfil.
+El checkpoint, la configuración y las métricas quedaron guardados.
+No se evaluó el rendimiento de esta política.
