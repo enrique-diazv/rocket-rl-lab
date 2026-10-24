@@ -14,6 +14,12 @@ from app.storage.evaluations import (
     get_evaluation_path,
     list_evaluations,
 )
+from app.storage.training import (
+    TrainingPoint,
+    TrainingSummary,
+    get_training_progress,
+    list_training_runs,
+)
 
 router = APIRouter(
     prefix="/api/rocket-ai",
@@ -62,3 +68,24 @@ def get_evaluations(
     model_id: str = Query(min_length=1),
 ) -> list[EvaluationSummary]:
     return list_evaluations(model_id=model_id)
+
+@router.get("/training-runs")
+def get_training_runs(
+    model_id: str = Query(min_length=1),
+) -> list[TrainingSummary]:
+    return list_training_runs(model_id=model_id)
+
+@router.get("/training-runs/{run_id}/progress")
+def get_training_run_progress(run_id: UUID) -> list[TrainingPoint]:
+    try:
+        return get_training_progress(run_id)
+    except FileNotFoundError as error:
+        raise HTTPException(
+            status_code=404,
+            detail="Métricas de entrenamiento no encontradas.",
+        ) from error
+    except ValueError as error:
+        raise HTTPException(
+            status_code=500,
+            detail="Las métricas almacenadas contienen datos inválidos.",
+        ) from error

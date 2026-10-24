@@ -8,6 +8,12 @@ const EvaluationEpisodeChart = lazy(() =>
   })),
 )
 
+const EvaluationSuccessChart = lazy(() =>
+  import('./EvaluationSuccessChart').then(chartModule => ({
+    default: chartModule.EvaluationSuccessChart,
+  })),
+)
+
 type EvaluationResultsProps = {
   evaluationId: string
   modelId: string
@@ -97,6 +103,7 @@ export function EvaluationResults({
               episodes={episodes}
               metric="steps"
             />
+            <EvaluationSuccessChart successRate={successRate} />
           </Suspense>
         </div>
       )}

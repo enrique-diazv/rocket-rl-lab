@@ -47,7 +47,7 @@ npm --prefix frontend run build
 - Checkpoints PPO de 10 240 y 1 024 000 pasos, guardados y cargados.
 - Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.
 - Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
-- Clasificación física de aterrizajes y cuatro casos críticos cubiertos por pruebas automatizadas.
+- Clasificación física de aterrizajes con pruebas de choque, ubicación, truncamiento y apoyo de las patas.
 - Frontend conectado con FastAPI mediante el proxy de Vite.
 - Inventario de checkpoints locales disponible en GET /api/rocket-ai/models.
 - Selector de modelos en React con carga, validación de respuestas y manejo de errores.
@@ -70,6 +70,9 @@ npm --prefix frontend run build
 - Registro de configuración y versiones en JSON, y métricas en CSV con retornos original, adicional y total separados por episodio.
 - Métrica de aterrizaje basada en contactos físicos activos de Box2D, con pruebas de regresión y comparación documentada entre referencia y penalización temporal.
 - Reward shaping configurable por consola: penalización temporal, premio por estabilidad y recompensa por progreso, con comparación de cuatro configuraciones y replays de éxitos y fallos.
+- Consulta de entrenamientos por modelo y lectura de métricas reales desde los CSV de PPO mediante la API.
+- Selector de entrenamientos, curvas de recompensa y duración, resumen del último registro y tabla numérica, con validación mediante Zod y carga diferida de las gráficas.
+
 
 ## Ejecutar en desarrollo
 
@@ -103,8 +106,13 @@ Desde la carpeta backend, utilizando un nombre de checkpoint nuevo:
 ```
 
 Los pasos deben ser positivos y múltiplos de 2048.
-Una penalización de 0 conserva la recompensa original; un valor positivo
-resta ese costo en cada paso.
+
+Con `--time-penalty 0`, `--hover-bonus 0` y `--progress-weight 0`
+se conserva la recompensa original.
+
+- `--time-penalty` resta un costo en cada paso.
+- `--hover-bonus` agrega un premio en cada paso que cumple la condición de estabilidad.
+- `--progress-weight` pondera el cambio de distancia al objetivo, calculado con las coordenadas normalizadas de la observación.
 
 Cada ensayo guarda configuración y métricas en
 backend/experiments/training/<id>.

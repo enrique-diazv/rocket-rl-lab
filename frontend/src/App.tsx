@@ -6,6 +6,8 @@ import { EpisodeSelector } from './components/EpisodeSelector'
 import { EpisodePlayer } from './components/EpisodePlayer'
 import { EvaluationSelector } from './components/EvaluationSelector'
 import { EvaluationResults } from './components/EvaluationResults'
+import { TrainingSelector } from './components/TrainingSelector'
+import { TrainingProgress } from './components/TrainingProgress'
 
 function App() {
   const [message, setMessage] = useState('Conexión sin comprobar.')
@@ -13,6 +15,7 @@ function App() {
   const [checking, setChecking] = useState(false)
   const [selectedModelId, setSelectedModelId] = useState('')
   const [selectedEvaluationId, setSelectedEvaluationId] = useState('')
+  const [selectedTrainingId, setSelectedTrainingId] = useState('')
 
   async function handleCheckConnection() {
     setChecking(true)
@@ -53,8 +56,25 @@ function App() {
           setSelectedModelId(modelId)
           setSelectedEpisodeId('')
           setSelectedEvaluationId('')
+          setSelectedTrainingId('')
         }}
       />
+
+      {selectedModelId && (
+        <TrainingSelector
+          key={`training-${selectedModelId}`}
+          modelId={selectedModelId}
+          selectedId={selectedTrainingId}
+          onSelect={setSelectedTrainingId}
+        />
+      )}
+
+      {selectedModelId && selectedTrainingId && (
+        <TrainingProgress
+          key={`progress-${selectedTrainingId}`}
+          runId={selectedTrainingId}
+        />
+      )}
 
       {selectedModelId && (
         <EvaluationSelector
@@ -64,6 +84,8 @@ function App() {
           onSelect={setSelectedEvaluationId}
         />
       )}
+
+
 
       {selectedModelId && selectedEvaluationId && (
         <EvaluationResults
