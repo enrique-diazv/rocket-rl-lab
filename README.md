@@ -107,13 +107,15 @@ Desde la carpeta backend, utilizando un nombre de checkpoint nuevo:
 
 Los pasos deben ser positivos y múltiplos de 2048.
 
-Con `--time-penalty 0`, `--hover-bonus 0`, `--progress-weight 0`
-y `--horizontal-progress-weight 0` se conserva la recompensa original.
+Con `--time-penalty 0`, `--hover-bonus 0`, `--progress-weight 0`,
+`--horizontal-progress-weight 0` y `--fuel-penalty 0`
+se conserva la recompensa original.
 
 - `--time-penalty` resta un costo en cada paso.
 - `--hover-bonus` agrega un premio en cada paso que cumple la condición de estabilidad.
 - `--progress-weight` pondera el cambio de distancia al objetivo, calculado con las coordenadas normalizadas de la observación.
 - `--horizontal-progress-weight` pondera la reducción del error horizontal respecto al centro: `abs(x anterior) - abs(x actual)`. Acercarse suma, alejarse resta y mantener el mismo error aporta cero.
+- `--fuel-penalty` multiplica un costo adicional por uso de motores: `0` sin propulsión, `0.03` para un lateral y `0.30` para el principal. Estos costos relativos no representan un tanque de combustible finito.
 
 Cada ensayo guarda configuración y métricas en
 backend/experiments/training/<id>.

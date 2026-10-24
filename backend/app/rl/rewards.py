@@ -6,6 +6,7 @@ import numpy as np
 
 HOVER_MAX_ANGLE = 0.1
 HOVER_MAX_SPEED = 0.2
+ENGINE_COST_BY_ACTION = (0.0, 0.03, 0.30, 0.03)
 
 
 class RewardShapingWrapper(gym.Wrapper):
@@ -17,6 +18,7 @@ class RewardShapingWrapper(gym.Wrapper):
         hover_bonus: float = 0.0,
         progress_weight: float = 0.0,
         horizontal_progress_weight: float = 0.0,
+        fuel_penalty: float = 0.0,
     ) -> None:
         if not isfinite(time_penalty) or time_penalty < 0:
             raise ValueError(
@@ -39,11 +41,17 @@ class RewardShapingWrapper(gym.Wrapper):
                 "y mayor o igual a cero."
             )
 
+        if not isfinite(fuel_penalty) or fuel_penalty < 0:
+            raise ValueError(
+                "La penalización por combustible debe ser finita "
+                "y mayor o igual a cero."
+            )
         super().__init__(env)
         self.time_penalty = float(time_penalty)
         self.hover_bonus = float(hover_bonus)
         self.progress_weight = float(progress_weight)
         self.horizontal_progress_weight = float(horizontal_progress_weight)
+        self.fuel_penalty = float(fuel_penalty)
         self._previous_horizontal_error = 0.0
         self._previous_distance: float | None = None
         self._base_return = 0.0
@@ -91,11 +99,14 @@ class RewardShapingWrapper(gym.Wrapper):
         )
         self._previous_horizontal_error = horizontal_error
 
+        fuel_reward = -self.fuel_penalty * ENGINE_COST_BY_ACTION[action]
+
         shaping_reward = (
             -self.time_penalty
             + hover_reward
             + progress_reward
             + horizontal_progress_reward
+            + fuel_reward
         )
         total_reward = base_reward + shaping_reward
 
@@ -111,6 +122,7 @@ class RewardShapingWrapper(gym.Wrapper):
                 "hover": hover_reward,
                 "progress": progress_reward,
                 "horizontal_progress": horizontal_progress_reward,
+                "fuel": fuel_reward,
                 "shaping": shaping_reward,
                 "total": total_reward,
             },

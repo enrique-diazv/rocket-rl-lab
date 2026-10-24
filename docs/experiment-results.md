@@ -383,3 +383,18 @@ La ejecución completó el presupuesto y guardó el checkpoint,
 la configuración y las métricas. Esta prueba verifica la integración;
 no permite concluir que Precision haya aprendido a aterrizar.
 No se realizó una evaluación de rendimiento de este checkpoint.
+
+## Efficiency: comprobación inicial del costo de motores
+
+Se verificaron las cuatro acciones del entorno estándar con
+`fuel_penalty=1.0`, reiniciando con semilla 42 antes de cada acción.
+
+| Acción | Ajuste adicional |
+| --- | ---: |
+| 0: sin propulsión | 0.00 |
+| 1: motor lateral | -0.03 |
+| 2: motor principal | -0.30 |
+| 3: motor lateral | -0.03 |
+
+La comprobación valida el componente de penalización por motores.
+Todavía no se entrenó ni evaluó una política Efficiency.
