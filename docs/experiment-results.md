@@ -432,3 +432,36 @@ La ejecución confirmó que el perfil aporta los valores iniciales
 y que un cero explícito reemplaza el costo de combustible del perfil.
 El checkpoint, la configuración y las métricas quedaron guardados.
 No se evaluó el rendimiento de esta política.
+
+## Especialidades en condiciones neutras
+
+### Precision
+
+- Perfil: `precision`, sin sobrescrituras.
+- Checkpoint: `precision.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Penalización temporal: 0.05.
+- Peso del progreso horizontal: 10.
+- Entrenamiento: `9736a5602d9f4af7b569b47b4b60ea5c`.
+- Evaluación: `db4f1db9115647d28ad1df1cec84534a`.
+
+Evaluación determinista con recompensa original y semillas 1000–1009:
+
+| Métrica | Resultado |
+| --- | ---: |
+| Recompensa media | 249.29 |
+| Desviación estándar | 35.28 |
+| Aterrizajes exitosos | 8/10 |
+| Pasos medios por episodio | 391.8 |
+| Truncamientos | 1 |
+
+Fallos observados:
+
+- Seed 1004: alcanzó el límite de 1.000 pasos.
+- Seed 1006: sin choque, en reposo y con ambas patas apoyadas,
+  pero con el centro fuera de la plataforma:
+  x=7.9529 frente al intervalo [8, 12].
+
+El resultado demuestra ocho aterrizajes válidos en esta evaluación.
+Todavía no demuestra una mayor precisión que las otras especialidades:
+falta comparar sus errores horizontales con un protocolo común.
