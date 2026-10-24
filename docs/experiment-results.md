@@ -367,3 +367,19 @@ por sí solos no demuestran el mismo mecanismo de reward hacking.
 Estos resultados utilizan una sola semilla de entrenamiento y diez
 episodios de evaluación por configuración. No garantizan el mismo
 desempeño en otras semillas o escenarios.
+
+## Precision: verificación inicial del progreso horizontal
+
+- Checkpoint: `precision_smoke.zip`.
+- Entrenamiento desde cero: 2.048 pasos, semilla 42.
+- Entorno estándar `LunarLander-v3`.
+- Peso del progreso horizontal: 10.
+- Penalización temporal: 0.05 por paso.
+- Premio por estabilidad y progreso euclidiano deshabilitados.
+- Shaping: `10 × (abs(x anterior) − abs(x actual)) − 0.05`.
+- Entrenamiento: `74f0950bbb4943dfafeaa44fa0fef71a`.
+
+La ejecución completó el presupuesto y guardó el checkpoint,
+la configuración y las métricas. Esta prueba verifica la integración;
+no permite concluir que Precision haya aprendido a aterrizar.
+No se realizó una evaluación de rendimiento de este checkpoint.

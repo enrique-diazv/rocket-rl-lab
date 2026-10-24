@@ -4,7 +4,6 @@ from typing import Any
 import gymnasium as gym
 import numpy as np
 
-
 HOVER_MAX_ANGLE = 0.1
 HOVER_MAX_SPEED = 0.2
 
@@ -17,6 +16,7 @@ class RewardShapingWrapper(gym.Wrapper):
         time_penalty: float = 0.0,
         hover_bonus: float = 0.0,
         progress_weight: float = 0.0,
+        horizontal_progress_weight: float = 0.0,
     ) -> None:
         if not isfinite(time_penalty) or time_penalty < 0:
             raise ValueError(
@@ -33,10 +33,18 @@ class RewardShapingWrapper(gym.Wrapper):
                 "El peso de progreso debe ser finito y mayor o igual a cero."
             )
 
+        if not isfinite(horizontal_progress_weight) or horizontal_progress_weight < 0:
+            raise ValueError(
+                "El peso de progreso horizontal debe ser finito "
+                "y mayor o igual a cero."
+            )
+
         super().__init__(env)
         self.time_penalty = float(time_penalty)
         self.hover_bonus = float(hover_bonus)
         self.progress_weight = float(progress_weight)
+        self.horizontal_progress_weight = float(horizontal_progress_weight)
+        self._previous_horizontal_error = 0.0
         self._previous_distance: float | None = None
         self._base_return = 0.0
         self._shaping_return = 0.0
@@ -49,10 +57,8 @@ class RewardShapingWrapper(gym.Wrapper):
         options: dict[str, Any] | None = None,
     ) -> tuple[np.ndarray, dict[str, Any]]:
         observation, info = self.env.reset(seed=seed, options=options)
-
-        self._previous_distance = float(
-            np.hypot(observation[0], observation[1])
-        )
+        self._previous_horizontal_error = abs(float(observation[0]))
+        self._previous_distance = float(np.hypot(observation[0], observation[1]))
         self._base_return = 0.0
         self._shaping_return = 0.0
         self._total_return = 0.0
@@ -71,19 +77,25 @@ class RewardShapingWrapper(gym.Wrapper):
         base_reward = float(reward)
         speed = float(np.hypot(observation[2], observation[3]))
         stable = (
-            abs(float(observation[4])) <= HOVER_MAX_ANGLE
-            and speed <= HOVER_MAX_SPEED
+            abs(float(observation[4])) <= HOVER_MAX_ANGLE and speed <= HOVER_MAX_SPEED
         )
         hover_reward = self.hover_bonus if stable else 0.0
 
         distance = float(np.hypot(observation[0], observation[1]))
-        progress_reward = self.progress_weight * (
-            self._previous_distance - distance
-        )
+        progress_reward = self.progress_weight * (self._previous_distance - distance)
         self._previous_distance = distance
 
+        horizontal_error = abs(float(observation[0]))
+        horizontal_progress_reward = self.horizontal_progress_weight * (
+            self._previous_horizontal_error - horizontal_error
+        )
+        self._previous_horizontal_error = horizontal_error
+
         shaping_reward = (
-            -self.time_penalty + hover_reward + progress_reward
+            -self.time_penalty
+            + hover_reward
+            + progress_reward
+            + horizontal_progress_reward
         )
         total_reward = base_reward + shaping_reward
 
@@ -98,6 +110,7 @@ class RewardShapingWrapper(gym.Wrapper):
                 "time": -self.time_penalty,
                 "hover": hover_reward,
                 "progress": progress_reward,
+                "horizontal_progress": horizontal_progress_reward,
                 "shaping": shaping_reward,
                 "total": total_reward,
             },

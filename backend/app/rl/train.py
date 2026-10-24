@@ -28,6 +28,7 @@ def main() -> None:
     parser.add_argument("--time-penalty", type=float, default=0.0)
     parser.add_argument("--hover-bonus", type=float, default=0.0)
     parser.add_argument("--progress-weight", type=float, default=0.0)
+    parser.add_argument("--horizontal-progress-weight", type=float, default=0.0)
     args = parser.parse_args()
 
     if args.timesteps <= 0 or args.timesteps % ROLLOUT_STEPS != 0:
@@ -52,6 +53,7 @@ def main() -> None:
             time_penalty=args.time_penalty,
             hover_bonus=args.hover_bonus,
             progress_weight=args.progress_weight,
+            horizontal_progress_weight=args.horizontal_progress_weight,
         )
 
         ppo_config = {
@@ -76,6 +78,7 @@ def main() -> None:
                             args.time_penalty > 0
                             or args.hover_bonus > 0
                             or args.progress_weight > 0
+                            or args.horizontal_progress_weight > 0
                         )
                         else "baseline"
                     ),
@@ -86,6 +89,8 @@ def main() -> None:
                     "progress_weight": args.progress_weight,
                     "progress_distance": "normalized_xy_euclidean",
                     "progress_formula": "previous_distance - current_distance",
+                    "horizontal_progress_weight": args.horizontal_progress_weight,
+                    "horizontal_progress_formula": ("abs(previous_x) - abs(current_x)"),
                 },
                 "ppo": ppo_config,
             }
@@ -104,6 +109,7 @@ def main() -> None:
         print(f"Penalizacion por paso: {args.time_penalty}")
         print(f"Premio por paso estable: {args.hover_bonus}")
         print(f"Peso del progreso: {args.progress_weight}")
+        print("Peso del progreso horizontal: " f"{args.horizontal_progress_weight}")
         print(f"Checkpoint de salida: {checkpoint_path}")
 
         model = PPO(env=env, **ppo_config)

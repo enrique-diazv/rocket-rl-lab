@@ -106,14 +106,24 @@ def test_hover_bonus_rewards_stability_without_progress(
     finally:
         shaped_env.close()
 
+
+@pytest.mark.parametrize(
+    ("weights", "expected_progress"),
+    [
+        ({"progress_weight": 10.0}, [0.0, 2.0, 2.0, -4.0]),
+        ({"horizontal_progress_weight": 10.0}, [0.0, 6.0, 0.0, -6.0]),
+    ],
+)
 def test_progress_rewards_changes_and_resets_between_episodes(
     monkeypatch: pytest.MonkeyPatch,
+    weights: dict[str, float],
+    expected_progress: list[float],
 ) -> None:
     base_env = create_lander_env()
     shaped_env = RewardShapingWrapper(
         base_env,
         time_penalty=0.05,
-        progress_weight=10.0,
+        **weights,
     )
     observation = np.zeros(8, dtype=np.float32)
 
@@ -128,11 +138,11 @@ def test_progress_rewards_changes_and_resets_between_episodes(
         lambda action: (observation.copy(), 0.0, False, False, {}),
     )
 
-    cases = [
-        (0.6, 0.8, 0.0),
-        (0.0, 0.8, 2.0),
-        (0.0, 0.6, 2.0),
-        (0.6, 0.8, -4.0),
+    positions = [
+        (0.6, 0.8),
+        (0.0, 0.8),
+        (0.0, 0.6),
+        (-0.6, 0.8),
     ]
 
     try:
@@ -141,16 +151,18 @@ def test_progress_rewards_changes_and_resets_between_episodes(
             shaped_env.reset(seed=42)
             accumulated_reward = 0.0
 
-            for x, y, expected_progress in cases:
+            for (x, y), expected in zip(positions, expected_progress, strict=True):
                 observation[:2] = (x * scale, y * scale)
 
                 _, reward, _, _, info = shaped_env.step(0)
 
-                expected = expected_progress * scale
-                assert info["reward_components"]["progress"] == pytest.approx(
-                    expected
+                components = info["reward_components"]
+                recorded_progress = (
+                    components["progress"] + components["horizontal_progress"]
                 )
-                assert reward == pytest.approx(expected - 0.05)
+
+                assert recorded_progress == pytest.approx(expected * scale)
+                assert reward == pytest.approx(expected * scale - 0.05)
                 accumulated_reward += reward
 
             assert accumulated_reward == pytest.approx(-0.20)
