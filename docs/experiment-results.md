@@ -307,3 +307,63 @@ la recompensa diseñada favorece un comportamiento distinto del objetivo.
 Este resultado corresponde a una ejecución de entrenamiento.
 La siguiente comparación sustituirá el premio por permanencia por
 una señal de progreso y un costo temporal.
+
+## Corrección: progreso hacia el objetivo y costo temporal
+
+### Configuración
+
+- Checkpoint: `neutral_hover_fixed.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Misma configuración de PPO que los experimentos anteriores.
+- Premio por estabilidad deshabilitado.
+- Penalización temporal: 0.05 por paso.
+- Peso del progreso: 10.
+- Distancia: norma euclidiana de las coordenadas normalizadas x e y.
+- Shaping: `10 × (distancia anterior − distancia actual) − 0.05`.
+- Entrenamiento: `be2d8220ad274c71b4bd98d3db67e45f`.
+
+La prueba del progreso comprueba acercamiento, alejamiento, recorridos
+cerrados y reinicio de la distancia entre episodios.
+
+### Comparación con recompensa original
+
+Todos los modelos se evaluaron con política determinista, semillas
+1000 a 1009 y la métrica de contactos físicos activos.
+
+| Configuración | Recompensa media | Desviación estándar | Éxitos | Pasos medios | Truncamientos |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Referencia | 189.20 | 106.54 | 6/10 | 296.4 | 0 |
+| Costo temporal | 252.90 | 24.80 | 10/10 | 333.4 | 0 |
+| Premio por estabilidad | -39.90 | 23.85 | 0/10 | 1000.0 | 10 |
+| Progreso + costo temporal | 212.53 | 92.32 | 6/10 | 411.6 | 2 |
+
+Evaluación de la corrección: `2bbaf1e289134254b533fbc519d05262`.
+
+### Fallos de la configuración corregida
+
+- Seeds 1001 y 1006: límite de tiempo alcanzado.
+- Seed 1004: reposo y ambas patas apoyadas, pero centro fuera
+  de la plataforma: x=7.4821 frente al intervalo [8, 12].
+- Seed 1009: choque del cuerpo, aunque ambas patas tenían contacto.
+
+### Replays guardados
+
+- Seed 1000: éxito, recompensa 286.97, 283 pasos.
+  Replay: `1fe46619516c4333a8c544d49405401c`.
+- Seed 1001: truncamiento, recompensa 119.74, 1000 pasos.
+  Replay: `af5f49169529430f8e9be7127920b4af`.
+
+### Conclusiones
+
+Sustituir el premio por permanencia por progreso y costo temporal
+recuperó aterrizajes exitosos y redujo los truncamientos en esta ejecución.
+
+La configuración con solo costo temporal obtuvo el mejor resultado
+observado: 10/10 éxitos. Agregar progreso no la superó.
+
+Los truncamientos indican que no se completó el aterrizaje a tiempo;
+por sí solos no demuestran el mismo mecanismo de reward hacking.
+
+Estos resultados utilizan una sola semilla de entrenamiento y diez
+episodios de evaluación por configuración. No garantizan el mismo
+desempeño en otras semillas o escenarios.

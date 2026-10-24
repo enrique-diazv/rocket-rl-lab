@@ -69,7 +69,7 @@ npm --prefix frontend run build
 - Entrenamiento configurable por consola, con protección contra sobrescritura de checkpoints.
 - Registro de configuración y versiones en JSON, y métricas en CSV con retornos original, adicional y total separados por episodio.
 - Métrica de aterrizaje basada en contactos físicos activos de Box2D, con pruebas de regresión y comparación documentada entre referencia y penalización temporal.
-- Reward shaping configurable por consola: penalización temporal y premio por estabilidad, con un caso documentado de reward hacking y un replay real guardado.
+- Reward shaping configurable por consola: penalización temporal, premio por estabilidad y recompensa por progreso, con comparación de cuatro configuraciones y replays de éxitos y fallos.
 
 ## Ejecutar en desarrollo
 

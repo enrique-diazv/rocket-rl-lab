@@ -16,6 +16,7 @@ class RewardShapingWrapper(gym.Wrapper):
         *,
         time_penalty: float = 0.0,
         hover_bonus: float = 0.0,
+        progress_weight: float = 0.0,
     ) -> None:
         if not isfinite(time_penalty) or time_penalty < 0:
             raise ValueError(
@@ -27,9 +28,16 @@ class RewardShapingWrapper(gym.Wrapper):
                 "El premio debe ser un número finito mayor o igual a cero."
             )
 
+        if not isfinite(progress_weight) or progress_weight < 0:
+            raise ValueError(
+                "El peso de progreso debe ser finito y mayor o igual a cero."
+            )
+
         super().__init__(env)
         self.time_penalty = float(time_penalty)
         self.hover_bonus = float(hover_bonus)
+        self.progress_weight = float(progress_weight)
+        self._previous_distance: float | None = None
         self._base_return = 0.0
         self._shaping_return = 0.0
         self._total_return = 0.0
@@ -42,6 +50,9 @@ class RewardShapingWrapper(gym.Wrapper):
     ) -> tuple[np.ndarray, dict[str, Any]]:
         observation, info = self.env.reset(seed=seed, options=options)
 
+        self._previous_distance = float(
+            np.hypot(observation[0], observation[1])
+        )
         self._base_return = 0.0
         self._shaping_return = 0.0
         self._total_return = 0.0
@@ -52,6 +63,9 @@ class RewardShapingWrapper(gym.Wrapper):
         self,
         action: int,
     ) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
+        if self._previous_distance is None:
+            raise gym.error.ResetNeeded("Ejecuta reset() antes de step().")
+
         observation, reward, terminated, truncated, info = self.env.step(action)
 
         base_reward = float(reward)
@@ -62,7 +76,15 @@ class RewardShapingWrapper(gym.Wrapper):
         )
         hover_reward = self.hover_bonus if stable else 0.0
 
-        shaping_reward = -self.time_penalty + hover_reward
+        distance = float(np.hypot(observation[0], observation[1]))
+        progress_reward = self.progress_weight * (
+            self._previous_distance - distance
+        )
+        self._previous_distance = distance
+
+        shaping_reward = (
+            -self.time_penalty + hover_reward + progress_reward
+        )
         total_reward = base_reward + shaping_reward
 
         self._base_return += base_reward
@@ -73,6 +95,9 @@ class RewardShapingWrapper(gym.Wrapper):
             **info,
             "reward_components": {
                 "base": base_reward,
+                "time": -self.time_penalty,
+                "hover": hover_reward,
+                "progress": progress_reward,
                 "shaping": shaping_reward,
                 "total": total_reward,
             },

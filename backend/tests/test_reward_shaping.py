@@ -105,3 +105,54 @@ def test_hover_bonus_rewards_stability_without_progress(
             assert reward == pytest.approx(2.0 + expected_shaping)
     finally:
         shaped_env.close()
+
+def test_progress_rewards_changes_and_resets_between_episodes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    base_env = create_lander_env()
+    shaped_env = RewardShapingWrapper(
+        base_env,
+        time_penalty=0.05,
+        progress_weight=10.0,
+    )
+    observation = np.zeros(8, dtype=np.float32)
+
+    monkeypatch.setattr(
+        base_env,
+        "reset",
+        lambda **kwargs: (observation.copy(), {}),
+    )
+    monkeypatch.setattr(
+        base_env,
+        "step",
+        lambda action: (observation.copy(), 0.0, False, False, {}),
+    )
+
+    cases = [
+        (0.6, 0.8, 0.0),
+        (0.0, 0.8, 2.0),
+        (0.0, 0.6, 2.0),
+        (0.6, 0.8, -4.0),
+    ]
+
+    try:
+        for scale in (1.0, 0.5):
+            observation[:2] = (0.6 * scale, 0.8 * scale)
+            shaped_env.reset(seed=42)
+            accumulated_reward = 0.0
+
+            for x, y, expected_progress in cases:
+                observation[:2] = (x * scale, y * scale)
+
+                _, reward, _, _, info = shaped_env.step(0)
+
+                expected = expected_progress * scale
+                assert info["reward_components"]["progress"] == pytest.approx(
+                    expected
+                )
+                assert reward == pytest.approx(expected - 0.05)
+                accumulated_reward += reward
+
+            assert accumulated_reward == pytest.approx(-0.20)
+    finally:
+        shaped_env.close()
