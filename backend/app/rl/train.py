@@ -31,6 +31,7 @@ def main() -> None:
     parser.add_argument("--progress-weight", type=float, default=0.0)
     parser.add_argument("--horizontal-progress-weight", type=float, default=0.0)
     parser.add_argument("--fuel-penalty", type=float, default=0.0)
+    parser.add_argument("--stability-penalty", type=float, default=0.0)
     args = parser.parse_args()
 
     if args.timesteps <= 0 or args.timesteps % ROLLOUT_STEPS != 0:
@@ -57,6 +58,7 @@ def main() -> None:
             progress_weight=args.progress_weight,
             horizontal_progress_weight=args.horizontal_progress_weight,
             fuel_penalty=args.fuel_penalty,
+            stability_penalty=args.stability_penalty,
         )
 
         ppo_config = {
@@ -83,6 +85,7 @@ def main() -> None:
                             or args.progress_weight > 0
                             or args.horizontal_progress_weight > 0
                             or args.fuel_penalty > 0
+                            or args.stability_penalty > 0
                         )
                         else "baseline"
                     ),
@@ -97,6 +100,10 @@ def main() -> None:
                     "horizontal_progress_formula": ("abs(previous_x) - abs(current_x)"),
                     "fuel_penalty": args.fuel_penalty,
                     "engine_cost_by_action": ENGINE_COST_BY_ACTION,
+                    "stability_penalty": args.stability_penalty,
+                    "stability_formula": (
+                        "sum(float(value) ** 2 for value in observation[2:6])"
+                    ),
                 },
                 "ppo": ppo_config,
             }
@@ -117,6 +124,7 @@ def main() -> None:
         print(f"Peso del progreso: {args.progress_weight}")
         print("Peso del progreso horizontal: " f"{args.horizontal_progress_weight}")
         print(f"Penalizacion adicional por combustible: {args.fuel_penalty}")
+        print(f"Penalizacion por inestabilidad: {args.stability_penalty}")
         print(f"Checkpoint de salida: {checkpoint_path}")
 
         model = PPO(env=env, **ppo_config)

@@ -19,6 +19,7 @@ class RewardShapingWrapper(gym.Wrapper):
         progress_weight: float = 0.0,
         horizontal_progress_weight: float = 0.0,
         fuel_penalty: float = 0.0,
+        stability_penalty: float = 0.0,
     ) -> None:
         if not isfinite(time_penalty) or time_penalty < 0:
             raise ValueError(
@@ -46,12 +47,18 @@ class RewardShapingWrapper(gym.Wrapper):
                 "La penalización por combustible debe ser finita "
                 "y mayor o igual a cero."
             )
+        if not isfinite(stability_penalty) or stability_penalty < 0:
+            raise ValueError(
+                "La penalización por inestabilidad debe ser finita "
+                "y mayor o igual a cero."
+            )
         super().__init__(env)
         self.time_penalty = float(time_penalty)
         self.hover_bonus = float(hover_bonus)
         self.progress_weight = float(progress_weight)
         self.horizontal_progress_weight = float(horizontal_progress_weight)
         self.fuel_penalty = float(fuel_penalty)
+        self.stability_penalty = float(stability_penalty)
         self._previous_horizontal_error = 0.0
         self._previous_distance: float | None = None
         self._base_return = 0.0
@@ -101,12 +108,18 @@ class RewardShapingWrapper(gym.Wrapper):
 
         fuel_reward = -self.fuel_penalty * ENGINE_COST_BY_ACTION[action]
 
+        stability_error = sum(
+            float(value) ** 2 for value in observation[2:6]
+        )
+        stability_reward = -self.stability_penalty * stability_error
+
         shaping_reward = (
             -self.time_penalty
             + hover_reward
             + progress_reward
             + horizontal_progress_reward
             + fuel_reward
+            + stability_reward
         )
         total_reward = base_reward + shaping_reward
 
@@ -123,6 +136,7 @@ class RewardShapingWrapper(gym.Wrapper):
                 "progress": progress_reward,
                 "horizontal_progress": horizontal_progress_reward,
                 "fuel": fuel_reward,
+                "stability": stability_reward,
                 "shaping": shaping_reward,
                 "total": total_reward,
             },

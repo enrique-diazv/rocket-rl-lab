@@ -398,3 +398,21 @@ Se verificaron las cuatro acciones del entorno estándar con
 
 La comprobación valida el componente de penalización por motores.
 Todavía no se entrenó ni evaluó una política Efficiency.
+
+## Stability: verificación inicial de integración
+
+- Checkpoint: `stability_smoke.zip`.
+- Entrenamiento desde cero: 2.048 pasos, semilla 42.
+- Entorno estándar `LunarLander-v3`.
+- Penalización temporal: 0.05 por paso.
+- Peso del progreso euclidiano: 10.
+- Penalización por inestabilidad: 0.1.
+- Premio por estabilidad, progreso horizontal y costo adicional
+  de motores deshabilitados.
+- Inestabilidad: suma de cuadrados de `observation[2:6]`.
+- Entrenamiento: `da6deccbe38c4c06b99618de296a2155`.
+
+La ejecución completó el presupuesto y guardó el checkpoint,
+la configuración y las métricas. Esta comprobación valida la integración;
+todavía no demuestra una mejora en la estabilidad de los aterrizajes.
+No se realizó una evaluación de rendimiento de este checkpoint.
