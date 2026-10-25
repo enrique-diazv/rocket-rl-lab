@@ -557,3 +557,39 @@ El 100% corresponde únicamente a esta muestra de evaluación.
 Falta medir velocidad, inclinación y giro con un protocolo común
 para determinar si Stability presenta un comportamiento más estable
 que las otras especialidades.
+
+### Balanced
+
+- Perfil: `balanced`, sin sobrescrituras.
+- Checkpoint: `balanced.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Penalización temporal: 0.05 por paso.
+- Progreso euclidiano y horizontal: peso 5 cada uno.
+- Multiplicador del costo adicional de motores: 0.5.
+- Penalización por inestabilidad: 0.05.
+- Premio por estabilidad deshabilitado.
+- Entrenamiento: `ad61d95973ba436e89e0f5ea1d9eedda`.
+- Evaluación: `db5b82bed4ce4e298f8e65625ea2c76e`.
+
+Evaluación determinista con recompensa original y semillas 1000–1009:
+
+| Métrica | Resultado |
+| --- | ---: |
+| Recompensa media | 211.80 |
+| Desviación estándar | 101.74 |
+| Aterrizajes exitosos | 6/10 |
+| Pasos medios por episodio | 328.5 |
+| Truncamientos | 0 |
+
+Fallos observados:
+
+- Seeds 1001, 1005 y 1007: sin choque, en reposo y con ambas patas
+  apoyadas, pero fuera de la plataforma [8, 12].
+  Sus posiciones finales fueron 17.3394, 12.0673 y 15.7187,
+  respectivamente.
+- Seed 1009: choque y cuerpo sin reposo, con ambas patas en contacto.
+  Su posición final fue 12.7264, también fuera de la plataforma.
+
+Combinar los objetivos produjo seis aterrizajes válidos en esta
+evaluación. Falta medir precisión, uso de motores y estabilidad
+para comparar las especialidades según sus objetivos.
