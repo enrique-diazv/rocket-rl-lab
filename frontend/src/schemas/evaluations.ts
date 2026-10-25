@@ -6,6 +6,11 @@ const evaluatedEpisodeSchema = episodeSummarySchema
   .extend({
     terminated: z.boolean(),
     truncated: z.boolean(),
+    final_horizontal_error: z.number().nonnegative().nullable().optional(),
+    engine_usage_cost: z.number().nonnegative().nullable().optional(),
+    pre_contact_speed: z.number().nonnegative().nullable().optional(),
+    pre_contact_abs_angle: z.number().nonnegative().nullable().optional(),
+    pre_contact_angular_speed: z.number().nonnegative().nullable().optional(),
   })
 
 export const evaluationSummarySchema = z.object({

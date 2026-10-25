@@ -3,9 +3,11 @@ from statistics import mean, stdev
 
 from stable_baselines3 import PPO
 
+from app.rl.contact_metrics import FirstContactTracker
 from app.rl.env_factory import create_lander_env
 from app.rl.landing_metrics import is_successful_landing
 from app.rl.evaluation_metrics import EpisodeEvaluation
+from app.rl.rewards import ENGINE_COST_BY_ACTION
 from app.storage.evaluations import save_evaluation
 from argparse import ArgumentParser
 
@@ -34,8 +36,10 @@ def main() -> None:
     try:
         for seed in EVALUATION_SEEDS:
             observation, _ = env.reset(seed=seed)
+            contact_tracker = FirstContactTracker(env.unwrapped)
             total_reward = 0.0
             steps = 0
+            engine_usage_cost = 0.0
             terminated = False
             truncated = False
 
@@ -44,8 +48,11 @@ def main() -> None:
                     observation,
                     deterministic=True,
                 )
-                observation, reward, terminated, truncated, _ = env.step(action.item())
+                action_id = int(action.item())
+                observation, reward, terminated, truncated, _ = env.step(action_id)
+                contact_tracker.observe()
                 total_reward += float(reward)
+                engine_usage_cost += ENGINE_COST_BY_ACTION[action_id]
                 steps += 1
 
             success = is_successful_landing(
@@ -53,9 +60,14 @@ def main() -> None:
                 terminated=terminated,
                 truncated=truncated,
             )
+            lander_env = env.unwrapped
+            pad_center = (lander_env.helipad_x1 + lander_env.helipad_x2) / 2.0
+            final_horizontal_error = abs(
+                float(lander_env.lander.position.x) - pad_center
+            )
             successful_episodes += int(success)
             episode_rewards.append(total_reward)
-
+            contact_motion = contact_tracker.pre_contact_motion
             episode_results.append(
                 EpisodeEvaluation(
                     seed=seed,
@@ -64,6 +76,23 @@ def main() -> None:
                     success=success,
                     terminated=terminated,
                     truncated=truncated,
+                    final_horizontal_error=final_horizontal_error,
+                    engine_usage_cost=engine_usage_cost,
+                    pre_contact_speed=(
+                        contact_motion.speed
+                        if contact_motion is not None
+                        else None
+                    ),
+                    pre_contact_abs_angle=(
+                        contact_motion.abs_angle
+                        if contact_motion is not None
+                        else None
+                    ),
+                    pre_contact_angular_speed=(
+                        contact_motion.angular_speed
+                        if contact_motion is not None
+                        else None
+                    ),
                 )
             )
 

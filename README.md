@@ -72,7 +72,8 @@ npm --prefix frontend run build
 - Reward shaping configurable por consola: penalización temporal, premio por estabilidad y recompensa por progreso, con comparación de cuatro configuraciones y replays de éxitos y fallos.
 - Consulta de entrenamientos por modelo y lectura de métricas reales desde los CSV de PPO mediante la API.
 - Selector de entrenamientos, curvas de recompensa y duración, resumen del último registro y tabla numérica, con validación mediante Zod y carga diferida de las gráficas.
-
+- Cinco perfiles PPO (Precision, Speed, Efficiency, Stability y Balanced) preentrenados en condiciones neutras con un presupuesto común de 1.024.000 pasos; resultados y limitaciones en el [registro de experimentos](docs/experiment-results.md).
+- Métricas por episodio de error horizontal final, costo relativo de motores y movimiento previo al contacto, con tabla en la web y compatibilidad con evaluaciones antiguas.
 
 ## Ejecutar en desarrollo
 

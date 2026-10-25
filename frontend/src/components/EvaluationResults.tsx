@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { getEvaluation } from '../services/evaluations'
 import type { EvaluationRecord } from '../schemas/evaluations'
+import { EvaluationMetricsTable } from './EvaluationMetricsTable'
 
 const EvaluationEpisodeChart = lazy(() =>
   import('./EvaluationEpisodeChart').then(chartModule => ({
@@ -105,6 +106,7 @@ export function EvaluationResults({
             />
             <EvaluationSuccessChart successRate={successRate} />
           </Suspense>
+          <EvaluationMetricsTable episodes={episodes} />
         </div>
       )}
     </section>

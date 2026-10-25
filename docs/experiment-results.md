@@ -593,3 +593,55 @@ Fallos observados:
 Combinar los objetivos produjo seis aterrizajes válidos en esta
 evaluación. Falta medir precisión, uso de motores y estabilidad
 para comparar las especialidades según sus objetivos.
+
+## Ampliación de la evaluación: métricas de comportamiento
+
+Se repitieron las evaluaciones de los cinco checkpoints sobre las
+semillas 1000–1009, sin entrenamiento adicional. Se conservaron
+las recompensas, duraciones y clasificaciones anteriores.
+
+Esta ampliación cubre las mediciones pendientes de las evaluaciones
+iniciales:
+
+- Error horizontal final: distancia absoluta entre el centro del
+  cuerpo y el centro de la plataforma, en unidades del mundo.
+- Costo de motores: suma de los costos relativos por acción
+  `[0, 0.03, 0.30, 0.03]`, independiente del shaping de cada perfil.
+- Movimiento previo al contacto: instantánea del paso anterior
+  al primer contacto de las patas detectado mediante Box2D.
+  Es una aproximación, no la medición exacta del instante del impacto.
+- Velocidad en unidades del mundo por segundo; inclinación absoluta
+  en radianes y velocidad angular absoluta en radianes por segundo.
+- Los registros antiguos muestran «No medido» en la tabla de la web.
+
+Evaluaciones ampliadas:
+
+- Precision: `61b0a8408b67451f8b56670326395452`.
+- Speed: `bd70e1680ce243b591389c678a419ec0`.
+- Efficiency: `171198cdb10b41eb90f7798d010445c9`.
+- Stability: `e28b270cab22460aaf314988ebe99832`.
+- Balanced: `2cae1d82a1f14c099e0999a0018f94ae`.
+
+### Comparación sobre aterrizajes válidos compartidos
+
+Solo las semillas 1002 y 1003 fueron exitosas para los cinco perfiles.
+Las siguientes cifras son medias sobre esos dos episodios por perfil.
+Velocidad, inclinación y giro corresponden al movimiento previo
+al contacto.
+
+| Perfil | Pasos | Error final | Costo motores | Velocidad | Inclinación | Giro |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Precision | 288.0 | 0.385 | 39.720 | 2.046 | 0.016 | 0.069 |
+| Speed | 310.0 | 0.808 | 37.920 | 1.342 | 0.022 | 0.030 |
+| Efficiency | 332.0 | 0.782 | 43.290 | 1.338 | 0.021 | 0.031 |
+| Stability | 224.5 | 0.402 | 28.110 | 1.172 | 0.045 | 0.085 |
+| Balanced | 340.0 | 0.438 | 40.560 | 1.473 | 0.057 | 0.061 |
+
+En este subconjunto, Precision obtuvo el menor error horizontal;
+Stability necesitó menos pasos y menor costo de motores, pero no
+presentó la menor inclinación ni el menor giro.
+
+Los nombres de los perfiles expresan objetivos de entrenamiento,
+no garantías de comportamiento. La comparación es exploratoria:
+utiliza una sola semilla de entrenamiento y únicamente dos semillas
+de evaluación exitosas compartidas.
