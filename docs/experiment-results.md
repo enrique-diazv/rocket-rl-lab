@@ -686,3 +686,35 @@ recarga mediante reset y penalización por consumo efectivo.
 
 Esta ejecución breve verifica la integración del tanque,
 no la capacidad de adaptación del modelo.
+
+## Escenarios: plataforma físicamente variable
+
+Evaluación de `stability.zip` sin entrenamiento adicional:
+
+- Escala de plataforma: 0.5.
+- Bordes: [9, 11], frente a [8, 12] del entorno original.
+- Gravedad: -10.
+- Límite: 1000 pasos por episodio.
+- Combustible ilimitado.
+- Evaluación determinista con semillas 1000–1009.
+- Evaluación: `23443b76ac7a46af934060c02e932fc9`.
+
+| Métrica | Plataforma original | Mitad del ancho |
+| --- | ---: | ---: |
+| Recompensa original media | 279.77 | 244.74 |
+| Desviación estándar | 17.00 | 88.56 |
+| Aterrizajes exitosos | 10/10 | 8/10 |
+| Pasos medios por episodio | 222.1 | 276.0 |
+| Truncamientos | 0 | 0 |
+
+Las semillas 1001 y 1009 no cumplieron el criterio de éxito.
+En la 1001, el error horizontal final fue 1.041, fuera del
+margen de una unidad respecto al centro.
+
+Tres casos automatizados verifican escalas 0.5, 1.0 y 2.0:
+bordes físicos, correspondencia entre dibujo y colisiones,
+observación inicial y aplicación de la escala tras reset.
+
+Esta es una referencia antes de la adaptación. Utiliza un solo
+checkpoint y diez episodios; no demuestra diferencias generales
+entre especialidades ni aprendizaje adicional.

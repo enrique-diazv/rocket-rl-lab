@@ -105,6 +105,12 @@ export function EvaluationResults({
                     ? 'Ilimitado'
                     : `${record.scenario.fuel_budget.toLocaleString('es-MX')} unidades relativas`}
               </p>
+              <p>
+                Escala de plataforma:{' '}
+                {record.scenario.platform_width_scale === undefined
+                  ? 'No registrada'
+                  : `${record.scenario.platform_width_scale.toLocaleString('es-MX')} × ancho original`}
+              </p>
             </>
           ) : (
             <p>La configuración del escenario no está registrada en esta evaluación.</p>

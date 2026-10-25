@@ -3,6 +3,7 @@ from typing import Literal
 import gymnasium as gym
 
 from app.rl.fuel_wrapper import FiniteFuelWrapper
+from app.rl.platform_wrapper import VariablePlatformWrapper
 from app.rl.scenario_config import ScenarioConfig
 
 
@@ -16,6 +17,12 @@ def create_scenario_env(
         gravity=config.gravity,
         max_episode_steps=config.max_episode_steps,
     )
+
+    if config.platform_width_scale != 1.0:
+        env = VariablePlatformWrapper(
+            env,
+            width_scale=config.platform_width_scale,
+        )
 
     if config.fuel_budget is not None:
         env = FiniteFuelWrapper(

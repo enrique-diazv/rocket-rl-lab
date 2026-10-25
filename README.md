@@ -192,6 +192,26 @@ modifica la recompensa; `--fuel-budget` limita la propulsión.
 La web distingue capacidad numérica, combustible ilimitado
 y capacidad no registrada en evaluaciones anteriores.
 
+### Plataforma variable
+
+`--platform-width-scale` acepta valores finitos entre 0.25 y 2.0,
+incluidos ambos extremos. Su valor predeterminado es 1.0.
+
+La escala cambia el ancho conservando el centro y las alturas.
+Se reconstruyen los segmentos de colisión y el terreno dibujado.
+Cada reset aplica la escala sobre el terreno recién generado;
+la escala 1.0 conserva el entorno original.
+
+Ejemplo desde backend, con un checkpoint existente:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.evaluate `
+    --checkpoint checkpoints/stability.zip `
+    --platform-width-scale 0.5
+```
+La configuración se guarda en `scenario.platform_width_scale`
+y se muestra junto a los resultados de evaluación.
+
 Se conservan las ocho observaciones originales. Los parámetros
 del escenario no se incorporan directamente a la observación.
 

@@ -43,6 +43,12 @@ def main() -> None:
         default=defaults.fuel_budget,
     )
 
+    parser.add_argument(
+        "--platform-width-scale",
+        type=float,
+        default=defaults.platform_width_scale,
+    )
+
     args = parser.parse_args()
 
     try:
@@ -50,6 +56,7 @@ def main() -> None:
             gravity=args.gravity,
             max_episode_steps=args.max_episode_steps,
             fuel_budget=args.fuel_budget,
+            platform_width_scale=args.platform_width_scale,
         )
     except ValidationError as error:
         parser.error(str(error))
@@ -66,6 +73,7 @@ def main() -> None:
         else f"Combustible: {scenario.fuel_budget} unidades relativas"
     )
 
+    print(f"Escala de plataforma: {scenario.platform_width_scale}")
     model = PPO.load(checkpoint_path, device="cpu")
     env = create_scenario_env(scenario)
     episode_rewards: list[float] = []

@@ -25,3 +25,10 @@ class ScenarioConfig(BaseModel):
         ge=0.0,
         allow_inf_nan=False,
     )
+
+    platform_width_scale: float = Field(
+        default=1.0,
+        ge=0.25,
+        le=2.0,
+        allow_inf_nan=False,
+    )
