@@ -465,3 +465,34 @@ Fallos observados:
 El resultado demuestra ocho aterrizajes válidos en esta evaluación.
 Todavía no demuestra una mayor precisión que las otras especialidades:
 falta comparar sus errores horizontales con un protocolo común.
+
+### Speed
+
+- Perfil: `speed`, sin sobrescrituras.
+- Checkpoint: `speed.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Penalización temporal: 0.10 por paso.
+- Los demás ajustes adicionales están deshabilitados.
+- Entrenamiento: `cbc77a3f477847558c5be065ea813bc2`.
+- Evaluación: `bf42258dda634a9db8792117e406357d`.
+
+Evaluación determinista con recompensa original y semillas 1000–1009:
+
+| Métrica | Resultado |
+| --- | ---: |
+| Recompensa media | 234.17 |
+| Desviación estándar | 51.82 |
+| Aterrizajes exitosos | 6/10 |
+| Pasos medios por episodio | 376.9 |
+| Truncamientos | 1 |
+
+Fallos observados:
+
+- Seeds 1000, 1004 y 1006: sin choque, en reposo y con ambas patas
+  apoyadas, pero fuera de la plataforma [8, 12].
+  Sus posiciones finales fueron 6.4538, 1.9782 y 5.4019, respectivamente.
+- Seed 1008: alcanzó el límite de 1.000 pasos.
+
+La duración media incluye episodios fallidos. Su valor inferior al
+de Precision no basta para concluir que Speed aterriza más rápido:
+obtuvo menos aterrizajes válidos en esta evaluación.
