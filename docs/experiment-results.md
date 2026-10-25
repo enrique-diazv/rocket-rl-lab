@@ -528,3 +528,32 @@ Fallos observados:
 Todavía no se midió el uso de motores durante la evaluación.
 Estos resultados no permiten concluir que Efficiency ahorre más
 combustible que las otras especialidades.
+
+### Stability
+
+- Perfil: `stability`, sin sobrescrituras.
+- Checkpoint: `stability.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Penalización temporal: 0.05 por paso.
+- Peso del progreso euclidiano: 10.
+- Penalización por inestabilidad: 0.10.
+- Los demás ajustes adicionales están deshabilitados.
+- Entrenamiento: `81d13ac42ffa470f87c837ef327b962e`.
+- Evaluación: `01737c1c4ccf402297c2e4335d2a258e`.
+
+Evaluación determinista con recompensa original y semillas 1000–1009:
+
+| Métrica | Resultado |
+| --- | ---: |
+| Recompensa media | 279.77 |
+| Desviación estándar | 17.00 |
+| Aterrizajes exitosos | 10/10 |
+| Pasos medios por episodio | 222.1 |
+| Truncamientos | 0 |
+
+Los diez episodios cumplieron el criterio físico de aterrizaje.
+El 100% corresponde únicamente a esta muestra de evaluación.
+
+Falta medir velocidad, inclinación y giro con un protocolo común
+para determinar si Stability presenta un comportamiento más estable
+que las otras especialidades.
