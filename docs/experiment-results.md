@@ -496,3 +496,35 @@ Fallos observados:
 La duración media incluye episodios fallidos. Su valor inferior al
 de Precision no basta para concluir que Speed aterriza más rápido:
 obtuvo menos aterrizajes válidos en esta evaluación.
+
+### Efficiency
+
+- Perfil: `efficiency`, sin sobrescrituras.
+- Checkpoint: `efficiency.zip`.
+- Entrenamiento desde cero: 1.024.000 pasos, semilla 42.
+- Penalización temporal: 0.05 por paso.
+- Multiplicador del costo adicional de motores: 1.0.
+- Los demás ajustes adicionales están deshabilitados.
+- Entrenamiento: `478cec8d09be42ffba0608c73d01cfdc`.
+- Evaluación: `b26237abe6be44a3ae892b673378beb4`.
+
+Evaluación determinista con recompensa original y semillas 1000–1009:
+
+| Métrica | Resultado |
+| --- | ---: |
+| Recompensa media | 179.44 |
+| Desviación estándar | 114.94 |
+| Aterrizajes exitosos | 6/10 |
+| Pasos medios por episodio | 438.7 |
+| Truncamientos | 2 |
+
+Fallos observados:
+
+- Seeds 1001 y 1009: choque y cuerpo sin reposo, aunque ambas patas
+  tenían contacto. Sus posiciones finales fueron 12.1870 y 12.5923,
+  fuera de la plataforma [8, 12].
+- Seeds 1004 y 1007: alcanzaron el límite de 1.000 pasos.
+
+Todavía no se midió el uso de motores durante la evaluación.
+Estos resultados no permiten concluir que Efficiency ahorre más
+combustible que las otras especialidades.
