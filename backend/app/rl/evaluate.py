@@ -6,7 +6,7 @@ from stable_baselines3 import PPO
 from app.rl.contact_metrics import FirstContactTracker
 from app.rl.landing_metrics import is_successful_landing
 from app.rl.evaluation_metrics import EpisodeEvaluation
-from app.rl.rewards import ENGINE_COST_BY_ACTION
+from app.rl.engine_config import ENGINE_COST_BY_ACTION
 from app.rl.scenario_config import ScenarioConfig
 from app.storage.evaluations import save_evaluation
 from argparse import ArgumentParser
@@ -36,12 +36,20 @@ def main() -> None:
         type=int,
         default=defaults.max_episode_steps,
     )
+
+    parser.add_argument(
+        "--fuel-budget",
+        type=float,
+        default=defaults.fuel_budget,
+    )
+
     args = parser.parse_args()
 
     try:
         scenario = ScenarioConfig(
             gravity=args.gravity,
             max_episode_steps=args.max_episode_steps,
+            fuel_budget=args.fuel_budget,
         )
     except ValidationError as error:
         parser.error(str(error))
@@ -51,6 +59,12 @@ def main() -> None:
     print(f"Checkpoint seleccionado: {checkpoint_path}")
     print(f"Gravedad: {scenario.gravity}")
     print(f"Limite del episodio: {scenario.max_episode_steps} pasos")
+
+    print(
+        "Combustible: ilimitado"
+        if scenario.fuel_budget is None
+        else f"Combustible: {scenario.fuel_budget} unidades relativas"
+    )
 
     model = PPO.load(checkpoint_path, device="cpu")
     env = create_scenario_env(scenario)
@@ -74,10 +88,15 @@ def main() -> None:
                     deterministic=True,
                 )
                 action_id = int(action.item())
-                observation, reward, terminated, truncated, _ = env.step(action_id)
+                observation, reward, terminated, truncated, info = env.step(
+                    action_id
+                )
                 contact_tracker.observe()
                 total_reward += float(reward)
-                engine_usage_cost += ENGINE_COST_BY_ACTION[action_id]
+                engine_usage_cost += info.get(
+                    "fuel_consumed",
+                    ENGINE_COST_BY_ACTION[action_id],
+                )
                 steps += 1
 
             success = is_successful_landing(

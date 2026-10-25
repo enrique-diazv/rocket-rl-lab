@@ -97,6 +97,14 @@ export function EvaluationResults({
                 {record.scenario.max_episode_steps.toLocaleString('es-MX')}
                 {' '}pasos
               </p>
+              <p>
+                Combustible:{' '}
+                {record.scenario.fuel_budget === undefined
+                  ? 'No registrado'
+                  : record.scenario.fuel_budget === null
+                    ? 'Ilimitado'
+                    : `${record.scenario.fuel_budget.toLocaleString('es-MX')} unidades relativas`}
+              </p>
             </>
           ) : (
             <p>La configuración del escenario no está registrada en esta evaluación.</p>

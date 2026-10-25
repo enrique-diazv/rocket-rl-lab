@@ -1,3 +1,4 @@
+from app.rl.engine_config import ENGINE_COST_BY_ACTION
 from math import isfinite
 from typing import Any
 
@@ -6,7 +7,6 @@ import numpy as np
 
 HOVER_MAX_ANGLE = 0.1
 HOVER_MAX_SPEED = 0.2
-ENGINE_COST_BY_ACTION = (0.0, 0.03, 0.30, 0.03)
 
 
 class RewardShapingWrapper(gym.Wrapper):
@@ -106,7 +106,11 @@ class RewardShapingWrapper(gym.Wrapper):
         )
         self._previous_horizontal_error = horizontal_error
 
-        fuel_reward = -self.fuel_penalty * ENGINE_COST_BY_ACTION[action]
+        engine_cost = info.get(
+            "fuel_consumed",
+            ENGINE_COST_BY_ACTION[action],
+        )
+        fuel_reward = -self.fuel_penalty * engine_cost
 
         stability_error = sum(
             float(value) ** 2 for value in observation[2:6]

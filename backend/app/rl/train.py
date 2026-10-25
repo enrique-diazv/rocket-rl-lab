@@ -6,8 +6,8 @@ from stable_baselines3.common.monitor import Monitor
 
 from app.rl.env_factory import create_lander_env
 from app.rl.agent_profiles import AGENT_PROFILES, RewardWeights
+from app.rl.engine_config import ENGINE_COST_BY_ACTION
 from app.rl.rewards import (
-    ENGINE_COST_BY_ACTION,
     HOVER_MAX_ANGLE,
     HOVER_MAX_SPEED,
     RewardShapingWrapper,

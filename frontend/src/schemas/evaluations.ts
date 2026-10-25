@@ -34,6 +34,7 @@ export const evaluationRecordSchema = evaluationSummarySchema
     scenario: z.object({
       gravity: z.number().gt(-12).lt(0),
       max_episode_steps: z.number().int().positive(),
+      fuel_budget: z.number().nonnegative().nullable().optional(),
     }).optional(),
     reward_mode: z.literal('original'),
     deterministic: z.literal(true),

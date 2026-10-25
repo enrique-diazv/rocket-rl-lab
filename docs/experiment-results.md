@@ -664,3 +664,25 @@ Prueba de integración con `stability.zip`, sin entrenamiento adicional:
 Esta prueba comprueba la integración y el límite temporal.
 No mide adaptación ni permite atribuir el resultado a la gravedad,
 porque también se redujo el tiempo disponible.
+
+## Escenarios: combustible finito
+
+Prueba de integración con `stability.zip`, sin entrenamiento adicional:
+
+- Gravedad: -10.
+- Límite: 5 pasos por episodio.
+- Capacidad inicial de combustible: 0.
+- Evaluación determinista con semillas 1000–1009.
+- Evaluación: `24674f29d8ff405286dc31def5486a85`.
+- Recompensa original media: -1.14.
+- Desviación estándar: 5.44.
+- Aterrizajes exitosos: 0/10.
+- Diez episodios truncados a los cinco pasos.
+- Costo de motores: cero en todos los episodios.
+
+Dos casos automatizados comprueban tanque vacío y agotamiento,
+comparando la física con las acciones esperadas. También verifican
+recarga mediante reset y penalización por consumo efectivo.
+
+Esta ejecución breve verifica la integración del tanque,
+no la capacidad de adaptación del modelo.

@@ -19,3 +19,9 @@ class ScenarioConfig(BaseModel):
         gt=0,
         strict=True,
     )
+
+    fuel_budget: float | None = Field(
+        default=None,
+        ge=0.0,
+        allow_inf_nan=False,
+    )

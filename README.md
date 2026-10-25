@@ -161,6 +161,37 @@ no ofrece tiempo suficiente para aterrizar.
   La web muestra esos valores y señala cuando un registro antiguo
   no incluye la configuración.
 
+### Combustible finito
+
+El evaluador acepta `--fuel-budget` con una capacidad finita,
+mayor o igual a cero. Omitirlo conserva combustible ilimitado.
+
+El consumo por paso utiliza unidades relativas:
+0 sin propulsión, 0.03 para un lateral y 0.30 para el principal.
+No representa litros ni una magnitud física calibrada.
+
+Si no alcanza para la acción solicitada, se ejecuta ese paso
+sin propulsión y sin consumir combustible. No hay encendidos
+parciales. El vuelo continúa hasta su final físico o límite
+temporal; quedarse sin combustible no termina el episodio.
+Cada reset recarga el tanque.
+
+Ejemplo desde backend, con un checkpoint existente:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.evaluate `
+    --checkpoint checkpoints/stability.zip `
+    --fuel-budget 0 `
+    --max-episode-steps 5
+```
+
+El consumo registrado y la penalización adicional por combustible
+utilizan las acciones efectivamente ejecutadas. `--fuel-penalty`
+modifica la recompensa; `--fuel-budget` limita la propulsión.
+
+La web distingue capacidad numérica, combustible ilimitado
+y capacidad no registrada en evaluaciones anteriores.
+
 Se conservan las ocho observaciones originales. Los parámetros
 del escenario no se incorporan directamente a la observación.
 
