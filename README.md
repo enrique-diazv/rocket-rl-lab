@@ -138,6 +138,31 @@ Para evaluar el modelo con la recompensa original:
 ```powershell
 & .\.venv\Scripts\python.exe -m app.rl.evaluate --checkpoint checkpoints/mi_experimento.zip
 ```
+## Evaluación con escenario configurable
+
+Desde la carpeta backend, usando un checkpoint existente:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.evaluate `
+    --checkpoint checkpoints/stability.zip `
+    --gravity -5 `
+    --max-episode-steps 5
+```
+
+Este ejemplo verifica el corte del episodio a los cinco pasos;
+no ofrece tiempo suficiente para aterrizar.
+
+- `--gravity` acepta valores finitos mayores que -12 y menores que 0.
+- `--max-episode-steps` acepta enteros positivos.
+- Sin estos parámetros se utilizan gravedad -10 y límite de 1000 pasos.
+- La evaluación utiliza la recompensa original del escenario elegido,
+  sin agregar reward shaping ni entrenar el modelo.
+- Cada nuevo resultado guarda su configuración en `scenario`.
+  La web muestra esos valores y señala cuando un registro antiguo
+  no incluye la configuración.
+
+Se conservan las ocho observaciones originales. Los parámetros
+del escenario no se incorporan directamente a la observación.
 
 ## Archivos generados
 

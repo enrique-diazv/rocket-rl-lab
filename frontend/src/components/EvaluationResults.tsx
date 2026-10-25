@@ -89,6 +89,18 @@ export function EvaluationResults({
           <p>
             Pasos entrenados: {record.training_timesteps.toLocaleString('es-MX')}
           </p>
+          {record.scenario ? (
+            <>
+              <p>Gravedad del escenario: {record.scenario.gravity}</p>
+              <p>
+                Límite del episodio:{' '}
+                {record.scenario.max_episode_steps.toLocaleString('es-MX')}
+                {' '}pasos
+              </p>
+            </>
+          ) : (
+            <p>La configuración del escenario no está registrada en esta evaluación.</p>
+          )}
           <p>Episodios evaluados: {episodes.length}</p>
           <p>Recompensa original media: {meanReward.toFixed(2)}</p>
           <p>

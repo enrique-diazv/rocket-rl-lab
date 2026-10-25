@@ -645,3 +645,22 @@ Los nombres de los perfiles expresan objetivos de entrenamiento,
 no garantías de comportamiento. La comparación es exploratoria:
 utiliza una sola semilla de entrenamiento y únicamente dos semillas
 de evaluación exitosas compartidas.
+
+## Escenarios: gravedad y límite de pasos
+
+Prueba de integración con `stability.zip`, sin entrenamiento adicional:
+
+- Gravedad: -5.
+- Límite: 5 pasos por episodio.
+- Evaluación determinista con semillas 1000–1009.
+- Evaluación: `c94a9d935ab143aeaecfaa3bc7d64863`.
+- Recompensa original media: 1.20.
+- Desviación estándar: 2.22.
+- Aterrizajes exitosos: 0/10.
+- Los diez episodios alcanzaron cinco pasos y finalizaron
+  con `terminated=False` y `truncated=True`.
+- El JSON registra ambos parámetros dentro de `scenario`.
+
+Esta prueba comprueba la integración y el límite temporal.
+No mide adaptación ni permite atribuir el resultado a la gravedad,
+porque también se redujo el tiempo disponible.

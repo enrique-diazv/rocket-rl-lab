@@ -4,31 +4,56 @@ from statistics import mean, stdev
 from stable_baselines3 import PPO
 
 from app.rl.contact_metrics import FirstContactTracker
-from app.rl.env_factory import create_lander_env
 from app.rl.landing_metrics import is_successful_landing
 from app.rl.evaluation_metrics import EpisodeEvaluation
 from app.rl.rewards import ENGINE_COST_BY_ACTION
+from app.rl.scenario_config import ScenarioConfig
 from app.storage.evaluations import save_evaluation
 from argparse import ArgumentParser
+
+from pydantic import ValidationError
+
+from app.rl.scenario_env import create_scenario_env
 
 EVALUATION_SEEDS = tuple(range(1_000, 1_010))
 
 
 def main() -> None:
+    defaults = ScenarioConfig()
     parser = ArgumentParser(description="Evalúa un checkpoint PPO.")
     parser.add_argument(
         "--checkpoint",
         type=Path,
         default=Path("checkpoints/neutral_initial.zip"),
     )
+    parser.add_argument(
+        "--gravity",
+        type=float,
+        default=defaults.gravity,
+    )
+    parser.add_argument(
+        "--max-episode-steps",
+        type=int,
+        default=defaults.max_episode_steps,
+    )
     args = parser.parse_args()
+
+    try:
+        scenario = ScenarioConfig(
+            gravity=args.gravity,
+            max_episode_steps=args.max_episode_steps,
+        )
+    except ValidationError as error:
+        parser.error(str(error))
 
     backend_directory = Path(__file__).resolve().parents[2]
     checkpoint_path = backend_directory / args.checkpoint
     print(f"Checkpoint seleccionado: {checkpoint_path}")
+    print(f"Gravedad: {scenario.gravity}")
+    print(f"Limite del episodio: {scenario.max_episode_steps} pasos")
 
     model = PPO.load(checkpoint_path, device="cpu")
-    env = create_lander_env()
+    env = create_scenario_env(scenario)
     episode_rewards: list[float] = []
     episode_results: list[EpisodeEvaluation] = []
 
@@ -79,14 +104,10 @@ def main() -> None:
                     final_horizontal_error=final_horizontal_error,
                     engine_usage_cost=engine_usage_cost,
                     pre_contact_speed=(
-                        contact_motion.speed
-                        if contact_motion is not None
-                        else None
+                        contact_motion.speed if contact_motion is not None else None
                     ),
                     pre_contact_abs_angle=(
-                        contact_motion.abs_angle
-                        if contact_motion is not None
-                        else None
+                        contact_motion.abs_angle if contact_motion is not None else None
                     ),
                     pre_contact_angular_speed=(
                         contact_motion.angular_speed
@@ -114,6 +135,7 @@ def main() -> None:
         episode_results,
         checkpoint_path=checkpoint_path,
         training_timesteps=int(model.num_timesteps),
+        scenario=scenario,
     )
     print(f"Evaluacion guardada en: {evaluation_path}")
 

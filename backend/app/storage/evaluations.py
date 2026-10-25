@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from uuid import UUID, uuid4
 from app.rl.evaluation_metrics import EpisodeEvaluation
+from app.rl.scenario_config import ScenarioConfig
 
 EVALUATION_DIRECTORY = (
     Path(__file__).resolve().parents[2] / "experiments" / "evaluations"
@@ -17,6 +18,7 @@ def save_evaluation(
     *,
     checkpoint_path: Path,
     training_timesteps: int,
+    scenario: ScenarioConfig,
 ) -> Path:
     if not episodes:
         raise ValueError("La evaluación debe contener episodios.")
@@ -31,6 +33,7 @@ def save_evaluation(
         "checkpoint_sha256": sha256(checkpoint_path.read_bytes()).hexdigest(),
         "training_timesteps": training_timesteps,
         "environment_id": "LunarLander-v3",
+        "scenario": scenario.model_dump(),
         "reward_mode": "original",
         "deterministic": True,
         "versions": {
@@ -61,6 +64,7 @@ def save_evaluation(
 
     return destination
 
+
 def get_evaluation_path(evaluation_id: UUID) -> Path:
     path = EVALUATION_DIRECTORY / f"{evaluation_id.hex}.json"
 
@@ -68,6 +72,7 @@ def get_evaluation_path(evaluation_id: UUID) -> Path:
         raise FileNotFoundError("La evaluación solicitada no existe.")
 
     return path
+
 
 @dataclass(frozen=True)
 class EvaluationSummary:
