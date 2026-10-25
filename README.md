@@ -42,7 +42,9 @@ npm --prefix frontend run build
 - Dependencias del backend instaladas y comprobadas.
 - Plantilla React con TypeScript compilada.
 - Ruta GET /api/health comprobada manualmente.
-- Creación del simulador centralizada en app/rl/env_factory.py.
+- Entorno neutro en app/rl/env_factory.py y escenarios configurables en app/rl/scenario_env.py.
+- Evaluación reutilizable desde Python, compartida con el comando de consola.
+- Funciones para continuar los checkpoints de las especialidades por bloques, con presupuesto limitado y conteo de pasos adicionales y episodios nuevos.
 - Agente aleatorio ejecutado durante tres episodios con seeds definidas.
 - Checkpoints PPO de 10 240 y 1 024 000 pasos, guardados y cargados.
 - Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.

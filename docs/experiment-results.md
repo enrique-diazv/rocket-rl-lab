@@ -718,3 +718,40 @@ observación inicial y aplicación de la escala tras reset.
 Esta es una referencia antes de la adaptación. Utiliza un solo
 checkpoint y diez episodios; no demuestra diferencias generales
 entre especialidades ni aprendizaje adicional.
+
+## Preparación de adaptación: evaluación inicial y presupuesto
+
+### Evaluación inicial de Stability
+
+Evaluación determinista de `stability.zip`, sin entrenamiento adicional:
+
+- Plataforma con escala 0.5.
+- Gravedad -10, límite de 1000 pasos y combustible ilimitado.
+- Semillas 2000–2029.
+- Evaluación: `3a30841880e04d2e9ac8cdf1c50cdce2`.
+- Aterrizajes exitosos: 22/30.
+- Tasa de éxito: 73.3%.
+- Recompensa original media: 232.40.
+- Desviación estándar: 86.27.
+
+No alcanzó el primer control de 27/30 éxitos.
+El protocolo define dos evaluaciones consecutivas sobre el umbral;
+para confirmar adaptación inicial reserva las semillas 2030–2059.
+
+### Comprobación del entrenamiento adicional
+
+Una primera ejecución agregó 2048 pasos al contador original
+de 1.024.000. El hash del checkpoint original permaneció igual.
+
+Después se comprobó un presupuesto de 6144 pasos,
+con bloques solicitados de 4096:
+
+| Intento | Pasos ejecutados | Pasos adicionales acumulados | Episodios terminados |
+| --- | ---: | ---: | ---: |
+| 1 | 4096 | 4096 | 9 |
+| 2 | 2048 | 6144 | 15 |
+| 3 | 0 | 6144 | 15 |
+
+Se respetó el presupuesto y el contador de episodios se conservó
+entre bloques. Estos entrenamientos fueron pruebas en memoria:
+sus modelos resultantes se descartaron y no se evaluó su rendimiento.
