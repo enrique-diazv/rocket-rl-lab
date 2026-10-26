@@ -782,3 +782,21 @@ original permaneció intacto.
 En esta ejecución el entrenamiento adicional redujo la tasa
 de éxito. No se alcanzó el criterio de 27/30 éxitos en dos
 evaluaciones consecutivas.
+
+## Comprobación técnica de la cola
+
+Se comprobó SQLite 3.50.4 y la inicialización repetible
+del esquema versión 1.
+
+Tres pruebas con bases temporales verifican:
+
+- La creación de cinco trabajos, el rechazo de otro experimento
+  pendiente y la reserva exclusiva de un trabajo activo.
+- La conservación de la última evaluación completada cuando
+  comienza una nueva evaluación.
+- La cancelación inmediata de trabajos pendientes y la espera
+  de confirmación del trabajo activo. Repetir la cancelación
+  no duplica eventos.
+
+Estas pruebas verifican persistencia y coordinación.
+Sus datos de ejemplo no representan resultados de entrenamiento.

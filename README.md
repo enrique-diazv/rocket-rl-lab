@@ -242,6 +242,33 @@ Los estados finales son `already_adapted`, `adapted` y
 `budget_reached`. Agotar el presupuesto no implica alcanzar
 el criterio. El checkpoint original se conserva.
 
+## Cola persistente de adaptación
+
+La cola utiliza SQLite, incluido en Python. Para inicializarla,
+ejecuta desde backend:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.storage.schema
+```
+
+La base se guarda en `backend/experiments/rocket_rl.sqlite3`,
+con esquema versión 1 y modo WAL. Repetir la inicialización
+conserva los datos existentes.
+
+Cada experimento crea cinco trabajos, uno por especialidad.
+Solo se permite un experimento pendiente o activo y un trabajo
+activo a la vez dentro de la cola.
+
+Se guardan eventos y progreso, conservando la última evaluación
+completada mientras se realiza la siguiente.
+
+La cancelación detiene inmediatamente los trabajos pendientes.
+El trabajo activo debe confirmar su detención desde el worker.
+
+La integración con el worker y la API está pendiente.
+El comando `app.rl.adapt` ejecuta una sesión directamente
+y todavía no utiliza esta cola.
+
 ## Archivos generados
 
 Los entornos, dependencias, compilaciones, secretos, checkpoints y
