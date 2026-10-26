@@ -1,0 +1,10 @@
+{
+  "scenario": {
+    "gravity": -10.0,
+    "max_episode_steps": 1000,
+    "fuel_budget": null,
+    "platform_width_scale": 0.5
+  },
+  "max_additional_timesteps": 20480,
+  "block_timesteps": 10240
+}

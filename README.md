@@ -217,6 +217,31 @@ y se muestra junto a los resultados de evaluación.
 Se conservan las ocho observaciones originales. Los parámetros
 del escenario no se incorporan directamente a la observación.
 
+## Adaptación por consola
+
+Desde backend, con el checkpoint de la especialidad disponible:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.rl.adapt `
+    --agent stability `
+    --config configs/narrow_pad.json
+```
+
+La configuración de ejemplo permite 20.480 pasos adicionales,
+en bloques de 10.240, sobre una plataforma con la mitad del ancho.
+
+Se evalúa antes de entrenar y después de cada bloque, usando
+30 semillas fijas. El criterio exige al menos 90% de éxito
+en dos evaluaciones consecutivas. Si supera el control inicial,
+se confirma con otras 30 semillas antes de marcar `already_adapted`.
+
+Cada ejecución guarda configuración, checkpoints, evaluaciones
+y resultado en `backend/experiments/adaptations/<id>/<agente>/`.
+
+Los estados finales son `already_adapted`, `adapted` y
+`budget_reached`. Agotar el presupuesto no implica alcanzar
+el criterio. El checkpoint original se conserva.
+
 ## Archivos generados
 
 Los entornos, dependencias, compilaciones, secretos, checkpoints y

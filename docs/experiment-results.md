@@ -755,3 +755,30 @@ con bloques solicitados de 4096:
 Se respetó el presupuesto y el contador de episodios se conservó
 entre bloques. Estos entrenamientos fueron pruebas en memoria:
 sus modelos resultantes se descartaron y no se evaluó su rendimiento.
+
+## Primera sesión completa de adaptación
+
+- Experimento: `e596bb274bde47a4a80075c272a97a12`.
+- Agente: Stability, desde su checkpoint neutro.
+- Plataforma: escala 0.5.
+- Gravedad -10, límite de 1000 pasos y combustible ilimitado.
+- Presupuesto adicional: 20.480 pasos.
+- Bloques: 10.240 pasos.
+- Evaluaciones deterministas con semillas 2000–2029.
+
+| Pasos adicionales | Episodios de entrenamiento | Éxitos | Recompensa original media |
+| --- | ---: | ---: | ---: |
+| 0 | 0 | 22/30 | 232.40 |
+| 10.240 | 30 | 21/30 | 230.41 |
+| 20.480 | 65 | 19/30 | 228.30 |
+
+Estado final: `budget_reached`.
+Pasos hasta satisfacer el criterio: `null`.
+
+Se respetó el presupuesto y se guardaron tres checkpoints,
+cada uno vinculado por hash a su evaluación. El checkpoint
+original permaneció intacto.
+
+En esta ejecución el entrenamiento adicional redujo la tasa
+de éxito. No se alcanzó el criterio de 27/30 éxitos en dos
+evaluaciones consecutivas.
