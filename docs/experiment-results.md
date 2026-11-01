@@ -800,3 +800,37 @@ Tres pruebas con bases temporales verifican:
 
 Estas pruebas verifican persistencia y coordinación.
 Sus datos de ejemplo no representan resultados de entrenamiento.
+
+## Comprobación del worker
+
+El experimento `af467b88b8874606882fb4394e3b4ec0` procesó
+las cinco especialidades secuencialmente, con plataforma
+de escala 0.5 y presupuesto adicional de cero pasos.
+
+Cada agente realizó su evaluación inicial de 30 episodios.
+Todos finalizaron en `budget_reached`; no hubo entrenamiento.
+
+| Agente | Éxito | Recompensa original media |
+| --- | ---: | ---: |
+| Precision | 63.3% | 233.56 |
+| Speed | 30.0% | 135.48 |
+| Efficiency | 26.7% | 186.09 |
+| Stability | 73.3% | 232.40 |
+| Balanced | 23.3% | 176.92 |
+
+Los estados y las métricas se comprobaron mediante lectura
+de SQLite después de finalizar los trabajos.
+
+En el experimento `6e6448a83806461aa00e9fed31a72b85`,
+la cancelación dejó los cinco trabajos en `cancelled`:
+cuatro pendientes y uno ya reservado por el ejecutor.
+No se realizó entrenamiento.
+
+También se comprobaron el bloqueo entre procesos y su
+liberación al terminar.
+
+Una prueba parametrizada con almacenamiento temporal verifica
+cuatro casos de recuperación: resultado completo, interrupción
+sin resultado final, cancelación pendiente y checkpoint alterado.
+Los cuatro casos pasan. Sus datos artificiales no representan
+resultados de entrenamiento.

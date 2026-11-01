@@ -1,3 +1,10 @@
+from app.rl.adaptation_metrics import AdaptationResult
+from app.storage import adaptations
+from app.storage.job_queue import (
+    ClaimedAdaptationJob,
+    get_active_adaptation_job,
+)
+from app.workers.recovery import recover_interrupted_job
 from pathlib import Path
 
 import pytest
@@ -202,3 +209,108 @@ def test_cancel_request_waits_for_active_job_to_stop() -> None:
         ).fetchone()[0]
 
     assert events_after_repeat == events_before_repeat
+
+def _save_completed_adaptation(job: ClaimedAdaptationJob) -> Path:
+    evaluation = AdaptationEvaluation(
+        extra_training_timesteps=0,
+        training_episodes=0,
+        elapsed_wall_seconds=1.0,
+        episodes=(
+            EpisodeEvaluation(
+                seed=2000,
+                steps=1000,
+                total_reward=5.0,
+                success=False,
+                terminated=False,
+                truncated=True,
+            ),
+        ),
+    )
+    checkpoint = adaptations.adaptation_checkpoint_path(
+        job.experiment_id, job.agent, 0
+    )
+    checkpoint.parent.mkdir(parents=True)
+    checkpoint.write_bytes(b"checkpoint de prueba")
+
+    adaptations.save_adaptation_evaluation(
+        evaluation,
+        experiment_id=job.experiment_id,
+        agent=job.agent,
+        evaluation_index=1,
+    )
+    adaptations.save_adaptation_result(
+        AdaptationResult(
+            agent=job.agent,
+            status="budget_reached",
+            evaluations=(evaluation,),
+            time_to_threshold_steps=None,
+        ),
+        experiment_id=job.experiment_id,
+    )
+    record_adaptation_progress(
+        job.job_id,
+        AdaptationProgress(
+            agent=job.agent,
+            phase="evaluating",
+            extra_training_timesteps=0,
+            training_episodes=0,
+            elapsed_wall_seconds=1.0,
+            evaluation_count=1,
+            evaluation=evaluation,
+        ),
+    )
+    return checkpoint
+
+@pytest.mark.usefixtures("queue_database")
+@pytest.mark.parametrize(
+    ("case", "expected_status"),
+    [
+        ("completed", "budget_reached"),
+        ("interrupted", "failed"),
+        ("cancel_requested", "cancelled"),
+        ("changed_checkpoint", "failed"),
+    ],
+)
+def test_worker_recovers_interrupted_job(
+    case: str,
+    expected_status: str,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        adaptations,
+        "ADAPTATION_DIRECTORY",
+        tmp_path / "adaptations",
+    )
+    create_adaptation_experiment(
+        AdaptationConfig(max_additional_timesteps=0)
+    )
+    job = claim_next_adaptation_job()
+    assert job is not None
+    checkpoint = _save_completed_adaptation(job)
+
+    if case in ("interrupted", "cancel_requested"):
+        (checkpoint.parent / "result.json").unlink()
+
+    if case == "cancel_requested":
+        request_adaptation_cancel(job.experiment_id)
+    elif case == "changed_checkpoint":
+        checkpoint.write_bytes(b"checkpoint modificado")
+
+    recover_interrupted_job()
+
+    with database.database_connection() as connection:
+        recovered = connection.execute(
+            "SELECT status, error FROM adaptation_jobs WHERE id = ?",
+            (job.job_id.hex,),
+        ).fetchone()
+
+    assert recovered["status"] == expected_status
+    assert get_active_adaptation_job() is None
+    assert checkpoint.is_file()
+    assert (
+        checkpoint.parent / "evaluations" / "evaluation_1.json"
+    ).is_file()
+
+    if case == "changed_checkpoint":
+        assert "hash" in recovered["error"]

@@ -382,3 +382,26 @@ def request_adaptation_cancel(experiment_id: UUID) -> None:
                 },
             ),
         )
+
+def get_active_adaptation_job() -> ClaimedAdaptationJob | None:
+    with database_connection() as connection:
+        job = connection.execute(
+            """
+            SELECT j.id, j.experiment_id, j.agent, e.config_json
+            FROM adaptation_jobs AS j
+            JOIN adaptation_experiments AS e
+                ON e.id = j.experiment_id
+            WHERE j.status IN ('running', 'evaluating', 'training')
+            LIMIT 1
+            """
+        ).fetchone()
+
+    if job is None:
+        return None
+
+    return ClaimedAdaptationJob(
+        job_id=UUID(job["id"]),
+        experiment_id=UUID(job["experiment_id"]),
+        agent=job["agent"],
+        config=AdaptationConfig.model_validate_json(job["config_json"]),
+    )

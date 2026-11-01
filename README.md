@@ -265,9 +265,35 @@ completada mientras se realiza la siguiente.
 La cancelación detiene inmediatamente los trabajos pendientes.
 El trabajo activo debe confirmar su detención desde el worker.
 
-La integración con el worker y la API está pendiente.
+La integración con la API está pendiente.
 El comando `app.rl.adapt` ejecuta una sesión directamente
-y todavía no utiliza esta cola.
+y no utiliza esta cola.
+
+### Worker
+
+Desde backend, ejecuta en una terminal independiente:
+
+```powershell
+& .\.venv\Scripts\python.exe -m app.workers.runner
+```
+
+El worker inicializa SQLite, revisa el trabajo que pudiera haber
+quedado activo y procesa los trabajos pendientes uno por uno.
+Un bloqueo nativo de Windows impide arrancar dos workers
+sobre el mismo almacenamiento.
+
+El progreso y los eventos se guardan en SQLite.
+La cancelación del trabajo activo se comprueba entre bloques
+de entrenamiento y evaluaciones.
+
+Ctrl+C solicita detener el worker en el siguiente punto seguro.
+Los trabajos pendientes permanecen en la cola.
+
+Después de una caída, un resultado final válido se recupera
+tras comprobar el hash de su checkpoint. Si no existe resultado
+final, el trabajo se marca como interrumpido o cancelado.
+Los archivos guardados se conservan; no se reanuda automáticamente
+una sesión incompleta.
 
 ## Archivos generados
 
