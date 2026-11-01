@@ -834,3 +834,17 @@ cuatro casos de recuperación: resultado completo, interrupción
 sin resultado final, cancelación pendiente y checkpoint alterado.
 Los cuatro casos pasan. Sus datos artificiales no representan
 resultados de entrenamiento.
+
+## Consulta de experimentos por HTTP
+
+Se comprobó `GET /api/adaptation/experiments/{experiment_id}`
+con dos experimentos existentes:
+
+- `af467b88b8874606882fb4394e3b4ec0`: cinco trabajos en
+  `budget_reached`, cancelación no solicitada y último evento 21.
+- `6e6448a83806461aa00e9fed31a72b85`: cinco trabajos en
+  `cancelled`, cancelación solicitada y último evento 39.
+
+Ambas respuestas coincidieron con los estados guardados en SQLite.
+La consulta del experimento cancelado admitió los campos de progreso
+y evaluación vacíos de los trabajos detenidos antes de medir resultados.

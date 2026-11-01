@@ -265,9 +265,30 @@ completada mientras se realiza la siguiente.
 La cancelación detiene inmediatamente los trabajos pendientes.
 El trabajo activo debe confirmar su detención desde el worker.
 
-La integración con la API está pendiente.
 El comando `app.rl.adapt` ejecuta una sesión directamente
 y no utiliza esta cola.
+
+### Consulta HTTP
+
+Con la API iniciada, un experimento existente se consulta mediante
+`GET /api/adaptation/experiments/{experiment_id}`.
+
+La respuesta incluye configuración, solicitud de cancelación,
+cinco trabajos y el identificador del último evento.
+Cada trabajo contiene estado, fechas y progreso disponible.
+
+El progreso conserva la última evaluación completada.
+Antes de disponer de mediciones, el progreso o su evaluación
+pueden ser `null`.
+
+La consulta utiliza una misma vista de SQLite para obtener
+el experimento, sus trabajos y el último evento.
+Los errores internos se registran en el servidor y se devuelven
+con un mensaje público breve.
+
+La API inicializa el esquema al arrancar.
+La creación, cancelación y transmisión de eventos por HTTP
+están pendientes de integración.
 
 ### Worker
 
