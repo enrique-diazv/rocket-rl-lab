@@ -287,8 +287,48 @@ Los errores internos se registran en el servidor y se devuelven
 con un mensaje público breve.
 
 La API inicializa el esquema al arrancar.
-La creación, cancelación y transmisión de eventos por HTTP
-están pendientes de integración.
+La transmisión de eventos por HTTP está pendiente de integración.
+
+### Crear y cancelar por HTTP
+
+Las siguientes rutas requieren `Authorization: Bearer <clave>`:
+
+- `POST /api/adaptation/experiments`: crea cinco trabajos
+  y devuelve su estado con HTTP 202.
+- `POST /api/adaptation/experiments/{experiment_id}/cancel`:
+  solicita la cancelación y devuelve el estado con HTTP 202.
+
+La clave del servidor se configura mediante `ROCKET_OPERATOR_TOKEN`
+y debe tener al menos 32 caracteres. Una configuración ausente
+o demasiado corta devuelve 503; credenciales ausentes o incorrectas
+devuelven 401.
+
+Para generar una clave local y arrancar la API, desde backend:
+
+```powershell
+if (-not (Test-Path -LiteralPath .\.env.operator-token)) {
+    & .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(32))" |
+        Set-Content -LiteralPath .\.env.operator-token -Encoding ascii
+}
+
+$env:ROCKET_OPERATOR_TOKEN = (
+    Get-Content -LiteralPath .\.env.operator-token -Raw
+).Trim()
+
+& .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+El archivo `.env.operator-token` está excluido de Git.
+Su contenido se carga en la variable de entorno al iniciar el servidor.
+
+La creación acepta la configuración del escenario y del entrenamiento.
+Por HTTP, el presupuesto adicional máximo es de 102.400 pasos por agente,
+el bloque máximo es de 10.240 y el episodio admite hasta 2.000 pasos.
+El presupuesto y el bloque deben ser múltiplos de 2048;
+el presupuesto puede ser cero y el bloque debe ser positivo.
+
+Una configuración inválida devuelve 422. Si ya existe un experimento
+pendiente o activo, la creación devuelve 409.
 
 ### Worker
 

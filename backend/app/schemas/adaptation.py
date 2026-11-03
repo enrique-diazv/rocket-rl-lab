@@ -7,6 +7,8 @@ from typing import Literal
 from uuid import UUID
 
 from app.rl.adaptation_config import AdaptationConfig
+from app.rl.scenario_config import ScenarioConfig
+
 
 class AdaptationEvaluationSummary(BaseModel):
     evaluation_index: int = Field(ge=1)
@@ -31,9 +33,9 @@ class AdaptationProgressSnapshot(BaseModel):
     evaluation_count: int = Field(ge=0)
     last_evaluation: AdaptationEvaluationSummary | None
 
+
 AdaptationJobStatus = (
-    Literal["queued", "running", "failed", "cancelled"]
-    | AdaptationPhase
+    Literal["queued", "running", "failed", "cancelled"] | AdaptationPhase
 )
 
 
@@ -58,3 +60,32 @@ class AdaptationExperimentSnapshot(BaseModel):
         max_length=5,
     )
     last_event_id: int = Field(ge=0)
+
+
+class AdaptationScenarioRequest(ScenarioConfig):
+    max_episode_steps: int = Field(
+        default=1000,
+        gt=0,
+        le=2000,
+        strict=True,
+    )
+
+
+class AdaptationExperimentRequest(AdaptationConfig):
+    scenario: AdaptationScenarioRequest = Field(
+        default_factory=AdaptationScenarioRequest,
+    )
+    max_additional_timesteps: int = Field(
+        default=102_400,
+        ge=0,
+        le=102_400,
+        multiple_of=2048,
+        strict=True,
+    )
+    block_timesteps: int = Field(
+        default=10_240,
+        gt=0,
+        le=10_240,
+        multiple_of=2048,
+        strict=True,
+    )

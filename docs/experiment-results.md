@@ -848,3 +848,22 @@ con dos experimentos existentes:
 Ambas respuestas coincidieron con los estados guardados en SQLite.
 La consulta del experimento cancelado admitió los campos de progreso
 y evaluación vacíos de los trabajos detenidos antes de medir resultados.
+
+## Creación y cancelación por HTTP
+
+Una solicitud de creación sin credenciales devolvió HTTP 401.
+
+La creación autorizada produjo el experimento
+`905065e760e04809ae1589cd70a1f450`, con presupuesto adicional
+cero y cinco trabajos en `queued`. Devolvió HTTP 202
+y último evento 40.
+
+La cancelación autorizada del mismo experimento devolvió HTTP 202,
+`cancel_requested=true`, cinco trabajos en `cancelled`
+y último evento 46. No se ejecutó entrenamiento.
+
+Ocho casos parametrizados verifican la autorización de creación
+y cancelación: servidor sin clave, credenciales ausentes,
+clave incorrecta y clave válida. Además del código HTTP,
+comprueban que las solicitudes rechazadas conservan los trabajos.
+Los ocho casos pasan con SQLite temporal.
