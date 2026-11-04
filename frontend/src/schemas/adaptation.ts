@@ -89,3 +89,30 @@ export type AdaptationExperiment = z.infer<
 >
 
 export type AdaptationJob = z.infer<typeof adaptationJobSchema>
+
+export const adaptationEventSchema = z.object({
+  id: z.number().int().positive(),
+  experiment_id: z.uuid(),
+  job_id: z.uuid().nullable(),
+  event_type: z.enum([
+    'experiment_created',
+    'job_started',
+    'job_progress',
+    'evaluation_completed',
+    'job_stopped',
+    'cancel_requested',
+  ]),
+  created_at: z.iso.datetime({ offset: true }),
+  agent: adaptationAgentIdSchema.nullable(),
+  status: adaptationJobStatusSchema.nullable(),
+  finished_at: z.iso.datetime({ offset: true }).nullable(),
+  progress: adaptationProgressSchema.nullable(),
+  cancel_requested: z.boolean().nullable(),
+  error: z.string().nullable(),
+})
+
+export const adaptationStreamEndSchema = z.object({
+  last_event_id: z.number().int().nonnegative(),
+})
+
+export type AdaptationEvent = z.infer<typeof adaptationEventSchema>

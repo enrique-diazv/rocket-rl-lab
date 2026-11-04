@@ -1,7 +1,7 @@
 import { useState, type SubmitEvent } from 'react'
 import type { AdaptationExperiment } from '../schemas/adaptation'
 import { getAdaptationExperiment } from '../services/adaptation'
-import { AdaptationJobCard } from './AdaptationJobCard'
+import { AdaptationExperimentLive } from './AdaptationExperimentLive'
 
 export function AdaptationExperimentViewer() {
   const [experimentId, setExperimentId] = useState('')
@@ -62,27 +62,10 @@ export function AdaptationExperimentViewer() {
       {error && <p role="alert">{error}</p>}
 
       {experiment && (
-        <div>
-          <p>
-            Experimento: <code>{experiment.id}</code>
-          </p>
-
-          <p>
-            Presupuesto adicional por agente:{' '}
-            {experiment.config.max_additional_timesteps.toLocaleString(
-              'es-MX',
-            )}{' '}
-            pasos.
-          </p>
-
-          {experiment.cancel_requested && (
-            <p>Se solicitó la cancelación de este experimento.</p>
-          )}
-
-          {experiment.jobs.map((job) => (
-            <AdaptationJobCard key={job.id} job={job} />
-          ))}
-        </div>
+        <AdaptationExperimentLive
+          key={experiment.id}
+          initialExperiment={experiment}
+        />
       )}
     </section>
   )
