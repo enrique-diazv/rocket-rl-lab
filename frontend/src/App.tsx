@@ -1,118 +1,40 @@
 import { useState } from 'react'
-import { checkBackendHealth } from './services/api'
-import './App.css'
-import { ModelSelector } from './components/ModelSelector'
-import { EpisodeSelector } from './components/EpisodeSelector'
-import { EpisodePlayer } from './components/EpisodePlayer'
-import { EvaluationSelector } from './components/EvaluationSelector'
-import { EvaluationResults } from './components/EvaluationResults'
-import { TrainingSelector } from './components/TrainingSelector'
-import { TrainingProgress } from './components/TrainingProgress'
+import NeutralLab from './NeutralLab'
+import { AdaptationAgents } from './components/AdaptationAgents'
 
 function App() {
-  const [message, setMessage] = useState('Conexión sin comprobar.')
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState('')
-  const [checking, setChecking] = useState(false)
-  const [selectedModelId, setSelectedModelId] = useState('')
-  const [selectedEvaluationId, setSelectedEvaluationId] = useState('')
-  const [selectedTrainingId, setSelectedTrainingId] = useState('')
-
-  async function handleCheckConnection() {
-    setChecking(true)
-    setMessage('Comprobando conexión...')
-
-    try {
-      await checkBackendHealth()
-      setMessage('Backend conectado.')
-    } catch (error: unknown) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo comprobar la conexión.',
-      )
-    } finally {
-      setChecking(false)
-    }
-  }
+  const [mode, setMode] = useState<'neutral' | 'adaptation'>('neutral')
 
   return (
-    <main>
-      <h1>Rocket RL Lab</h1>
-      <p>Entrenamiento y evaluación de un agente PPO.</p>
+    <>
+      <nav aria-label="Modos del laboratorio">
+        <button
+          type="button"
+          aria-pressed={mode === 'neutral'}
+          onClick={() => setMode('neutral')}
+        >
+          Laboratorio neutral
+        </button>
 
-      <p role="status">{message}</p>
+        <button
+          type="button"
+          aria-pressed={mode === 'adaptation'}
+          onClick={() => setMode('adaptation')}
+        >
+          Desafío de adaptación
+        </button>
+      </nav>
 
-      <button
-        type="button"
-        onClick={handleCheckConnection}
-        disabled={checking}
-      >
-        {checking ? 'Comprobando...' : 'Comprobar conexión'}
-      </button>
-
-      <ModelSelector
-        selectedId={selectedModelId}
-        onSelect={(modelId) => {
-          setSelectedModelId(modelId)
-          setSelectedEpisodeId('')
-          setSelectedEvaluationId('')
-          setSelectedTrainingId('')
-        }}
-      />
-
-      {selectedModelId && (
-        <TrainingSelector
-          key={`training-${selectedModelId}`}
-          modelId={selectedModelId}
-          selectedId={selectedTrainingId}
-          onSelect={setSelectedTrainingId}
-        />
+      {mode === 'neutral' ? (
+        <NeutralLab />
+      ) : (
+        <main>
+          <h1>Desafío de adaptación</h1>
+          <p>Consulta los cinco agentes entrenados.</p>
+          <AdaptationAgents />
+        </main>
       )}
-
-      {selectedModelId && selectedTrainingId && (
-        <TrainingProgress
-          key={`progress-${selectedTrainingId}`}
-          runId={selectedTrainingId}
-        />
-      )}
-
-      {selectedModelId && (
-        <EvaluationSelector
-          key={`evaluations-${selectedModelId}`}
-          modelId={selectedModelId}
-          selectedId={selectedEvaluationId}
-          onSelect={setSelectedEvaluationId}
-        />
-      )}
-
-
-
-      {selectedModelId && selectedEvaluationId && (
-        <EvaluationResults
-          key={`results-${selectedEvaluationId}`}
-          evaluationId={selectedEvaluationId}
-          modelId={selectedModelId}
-        />
-      )}
-
-      {selectedModelId && (
-        <EpisodeSelector
-          key={selectedModelId}
-          modelId={selectedModelId}
-          selectedId={selectedEpisodeId}
-          onSelect={setSelectedEpisodeId}
-        />
-      )}
-
-      {selectedModelId && selectedEpisodeId && (
-        <EpisodePlayer
-          key={selectedEpisodeId}
-          episodeId={selectedEpisodeId}
-          modelId={selectedModelId}
-        />
-      )}
-
-    </main>
+    </>
   )
 }
 
