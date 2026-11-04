@@ -89,3 +89,33 @@ class AdaptationExperimentRequest(AdaptationConfig):
         multiple_of=2048,
         strict=True,
     )
+
+
+AdaptationEventType = Literal[
+    "experiment_created",
+    "job_started",
+    "job_progress",
+    "evaluation_completed",
+    "job_stopped",
+    "cancel_requested",
+]
+
+
+class AdaptationEventSnapshot(BaseModel):
+    id: int = Field(gt=0)
+    experiment_id: UUID
+    job_id: UUID | None
+    event_type: AdaptationEventType
+    created_at: datetime
+    agent: str | None
+    status: AdaptationJobStatus | None
+    finished_at: datetime | None
+    progress: AdaptationProgressSnapshot | None
+    cancel_requested: bool | None
+    error: str | None
+
+
+class AdaptationAgentSummary(BaseModel):
+    id: str
+    name: str
+    checkpoint_available: bool

@@ -8,15 +8,16 @@ from app.schemas.adaptation import (
     AdaptationProgressSnapshot,
 )
 from app.storage.database import database_connection
+from app.rl.agent_profiles import AGENT_PROFILES
+from app.schemas.adaptation import AdaptationAgentSummary
+from app.storage.checkpoints import CHECKPOINT_DIRECTORY
 
 
 def _job_snapshot(row: sqlite3.Row) -> AdaptationJobSnapshot:
     progress = (
         None
         if row["progress_json"] is None
-        else AdaptationProgressSnapshot.model_validate_json(
-            row["progress_json"]
-        )
+        else AdaptationProgressSnapshot.model_validate_json(row["progress_json"])
     )
 
     return AdaptationJobSnapshot(
@@ -28,11 +29,10 @@ def _job_snapshot(row: sqlite3.Row) -> AdaptationJobSnapshot:
         finished_at=row["finished_at"],
         progress=progress,
         error=(
-            "No se pudo completar este trabajo."
-            if row["status"] == "failed"
-            else None
+            "No se pudo completar este trabajo." if row["status"] == "failed" else None
         ),
     )
+
 
 def get_adaptation_experiment(
     experiment_id: UUID,
@@ -76,10 +76,20 @@ def get_adaptation_experiment(
     return AdaptationExperimentSnapshot(
         id=experiment_id,
         created_at=experiment["created_at"],
-        config=AdaptationConfig.model_validate_json(
-            experiment["config_json"]
-        ),
+        config=AdaptationConfig.model_validate_json(experiment["config_json"]),
         cancel_requested=bool(experiment["cancel_requested"]),
         jobs=[_job_snapshot(job) for job in jobs],
         last_event_id=last_event_id,
     )
+
+def list_adaptation_agents() -> list[AdaptationAgentSummary]:
+    return [
+        AdaptationAgentSummary(
+            id=agent_id,
+            name=agent_id.title(),
+            checkpoint_available=(
+                CHECKPOINT_DIRECTORY / f"{agent_id}.zip"
+            ).is_file(),
+        )
+        for agent_id in AGENT_PROFILES
+    ]
