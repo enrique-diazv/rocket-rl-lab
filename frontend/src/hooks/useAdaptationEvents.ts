@@ -4,7 +4,12 @@ import {
   readAdaptationEvent,
   readAdaptationStreamEnd,
 } from '../services/adaptationEvents'
-import { applyAdaptationEvent } from '../state/adaptation'
+import {
+  applyAdaptationEvent,
+  hasCompleteAdaptationHistory,
+  recordAdaptationEvaluation,
+  type AdaptationEvaluationHistory,
+} from '../state/adaptation'
 
 export type AdaptationConnectionStatus =
   | 'connecting'
@@ -21,18 +26,23 @@ export function useAdaptationEvents(
     useState<AdaptationConnectionStatus>('connecting')
   const [error, setError] = useState('')
 
+  const [evaluationHistory, setEvaluationHistory] =
+    useState<AdaptationEvaluationHistory>({})
+
   useEffect(() => {
     let currentExperiment = initialExperiment
+    let currentHistory: AdaptationEvaluationHistory = {}
     let stopped = false
 
     setExperiment(initialExperiment)
     setConnectionStatus('connecting')
     setError('')
+    setEvaluationHistory({})
 
     const source = new EventSource(
       `/api/adaptation/experiments/${
         encodeURIComponent(initialExperiment.id)
-      }/events?after=${initialExperiment.last_event_id}`,
+      }/events?after=0`,
     )
 
     function fail(message: string) {
@@ -59,10 +69,19 @@ export function useAdaptationEvents(
           currentExperiment,
           update,
         )
+        const nextHistory = recordAdaptationEvaluation(
+          currentHistory,
+          update,
+        )
 
         if (nextExperiment !== currentExperiment) {
           currentExperiment = nextExperiment
           setExperiment(nextExperiment)
+        }
+
+        if (nextHistory !== currentHistory) {
+          currentHistory = nextHistory
+          setEvaluationHistory(nextHistory)
         }
       } catch (error: unknown) {
         fail(
@@ -81,10 +100,11 @@ export function useAdaptationEvents(
 
         if (
           lastEventId !== currentExperiment.last_event_id ||
-          currentExperiment.jobs.some((job) => job.finished_at === null)
+          currentExperiment.jobs.some((job) => job.finished_at === null) ||
+          !hasCompleteAdaptationHistory(currentExperiment, currentHistory)
         ) {
           throw new Error(
-            'La transmisión terminó sin confirmar todos los trabajos.',
+            'La transmisión terminó con trabajos o evaluaciones sin confirmar.',
           )
         }
 
@@ -120,5 +140,14 @@ export function useAdaptationEvents(
     }
   }, [initialExperiment])
 
-  return { experiment, connectionStatus, error }
+  return {
+    experiment,
+    connectionStatus,
+    error,
+    evaluationHistory,
+    historyReady: hasCompleteAdaptationHistory(
+      experiment,
+      evaluationHistory,
+    ),
+  }
 }

@@ -116,3 +116,7 @@ export const adaptationStreamEndSchema = z.object({
 })
 
 export type AdaptationEvent = z.infer<typeof adaptationEventSchema>
+
+export type AdaptationEvaluationPoint = z.infer<
+  typeof adaptationEvaluationSchema
+>
