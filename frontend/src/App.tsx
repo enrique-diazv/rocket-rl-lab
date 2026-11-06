@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import NeutralLab from './NeutralLab'
-import { AdaptationAgents } from './components/AdaptationAgents'
-import { AdaptationExperimentViewer } from './components/AdaptationExperimentViewer'
+import AdaptationChallenge from './AdaptationChallenge'
 
 function App() {
   const [mode, setMode] = useState<'neutral' | 'adaptation'>('neutral')
@@ -29,12 +28,7 @@ function App() {
       {mode === 'neutral' ? (
         <NeutralLab />
       ) : (
-        <main>
-          <h1>Desafío de adaptación</h1>
-          <p>Consulta los cinco agentes entrenados.</p>
-          <AdaptationAgents />
-          <AdaptationExperimentViewer />
-        </main>
+        <AdaptationChallenge />
       )}
     </>
   )

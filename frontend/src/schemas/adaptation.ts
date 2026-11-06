@@ -121,3 +121,26 @@ export type AdaptationEvent = z.infer<typeof adaptationEventSchema>
 export type AdaptationEvaluationPoint = z.infer<
   typeof adaptationEvaluationSchema
 >
+
+export const adaptationExperimentRequestSchema =
+  adaptationConfigSchema.extend({
+    scenario: adaptationScenarioSchema.extend({
+      max_episode_steps: z.number().int().min(1).max(2000),
+    }),
+    max_additional_timesteps: z
+      .number()
+      .int()
+      .min(0)
+      .max(102400)
+      .multipleOf(2048),
+    block_timesteps: z
+      .number()
+      .int()
+      .min(1)
+      .max(10240)
+      .multipleOf(2048),
+  })
+
+export type AdaptationExperimentRequest = z.infer<
+  typeof adaptationExperimentRequestSchema
+>
