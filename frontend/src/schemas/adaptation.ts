@@ -62,6 +62,7 @@ export const adaptationProgressSchema = z.object({
   elapsed_wall_seconds: z.number().nonnegative(),
   evaluation_count: z.number().int().nonnegative(),
   last_evaluation: adaptationEvaluationSchema.nullable(),
+  time_to_threshold_steps: z.number().int().nonnegative().nullable(),
 })
 
 export const adaptationJobSchema = z.object({

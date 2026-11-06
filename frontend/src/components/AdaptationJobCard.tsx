@@ -1,16 +1,5 @@
 import type { AdaptationJob } from '../schemas/adaptation'
-
-const statusLabels: Record<AdaptationJob['status'], string> = {
-  queued: 'En cola',
-  running: 'Iniciando',
-  evaluating: 'Evaluando',
-  training: 'Entrenando',
-  already_adapted: 'Ya cumplía el criterio',
-  adapted: 'Criterio alcanzado',
-  budget_reached: 'Presupuesto agotado',
-  failed: 'Error',
-  cancelled: 'Cancelado',
-}
+import { adaptationStatusLabels } from '../presentation/adaptation'
 
 type AdaptationJobCardProps = {
   job: AdaptationJob
@@ -23,7 +12,7 @@ export function AdaptationJobCard({ job }: AdaptationJobCardProps) {
   return (
     <article>
       <h3>{job.agent}</h3>
-      <p>Estado: {statusLabels[job.status]}</p>
+      <p>Estado: {adaptationStatusLabels[job.status]}</p>
 
       {progress ? (
         <dl>

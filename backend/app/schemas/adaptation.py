@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 from app.rl.adaptation_metrics import AdaptationPhase
 
@@ -32,6 +32,14 @@ class AdaptationProgressSnapshot(BaseModel):
     elapsed_wall_seconds: float = Field(ge=0, allow_inf_nan=False)
     evaluation_count: int = Field(ge=0)
     last_evaluation: AdaptationEvaluationSummary | None
+
+    @computed_field
+    @property
+    def time_to_threshold_steps(self) -> int | None:
+        if self.phase in ("already_adapted", "adapted"):
+            return self.extra_training_timesteps
+
+        return None
 
 
 AdaptationJobStatus = (

@@ -5,6 +5,7 @@ import {
 } from '../hooks/useAdaptationEvents'
 import { AdaptationJobCard } from './AdaptationJobCard'
 import { lazy, Suspense } from 'react'
+import { AdaptationComparisonTable } from './AdaptationComparisonTable'
 
 const AdaptationChart = lazy(() =>
   import('./AdaptationChart').then((chartModule) => ({
@@ -61,6 +62,19 @@ export function AdaptationExperimentLive({
       {experiment.jobs.map((job) => (
         <AdaptationJobCard key={job.id} job={job} />
       ))}
+
+      <section aria-labelledby="adaptation-comparison-title">
+        <h2 id="adaptation-comparison-title">
+          Comparación de resultados
+        </h2>
+
+        <p>
+          El tiempo registrado corresponde a cada trabajo y depende
+          del equipo.
+        </p>
+
+        <AdaptationComparisonTable jobs={experiment.jobs} />
+      </section>
 
       <section aria-labelledby="adaptation-charts-title">
         <h2 id="adaptation-charts-title">Curvas de evaluación</h2>
