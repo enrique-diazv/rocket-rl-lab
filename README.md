@@ -1,10 +1,8 @@
 # Rocket RL Lab
 
-Proyecto educativo de aprendizaje por refuerzo para entrenar un agente
-PPO en LunarLander-v3 y estudiar el diseño de recompensas.
-
-Primero desarrollaremos Rocket AI y los experimentos de reward shaping.
-Adaptation Challenge será una extensión posterior.
+Proyecto educativo de aprendizaje por refuerzo para estudiar cómo el
+diseño de recompensas y los cambios de escenario afectan el aterrizaje
+de agentes PPO en LunarLander-v3.
 
 ## Entorno de desarrollo
 
@@ -39,66 +37,63 @@ npm --prefix frontend run build
 
 ## Estado actual
 
-- Dependencias del backend instaladas y comprobadas.
-- Plantilla React con TypeScript compilada.
-- Ruta GET /api/health comprobada manualmente.
-- Entorno neutro en app/rl/env_factory.py y escenarios configurables en app/rl/scenario_env.py.
-- Evaluación reutilizable desde Python, compartida con el comando de consola.
-- Funciones para continuar los checkpoints de las especialidades por bloques, con presupuesto limitado y conteo de pasos adicionales y episodios nuevos.
-- Agente aleatorio ejecutado durante tres episodios con seeds definidas.
-- Checkpoints PPO de 10 240 y 1 024 000 pasos, guardados y cargados.
-- Ambos checkpoints evaluados con las mismas diez seeds; resultados en docs/experiment-results.md.
-- Evaluación y visualización con selección de checkpoint desde la consola; visualización con seeds configurables.
-- Clasificación física de aterrizajes con pruebas de choque, ubicación, truncamiento y apoyo de las patas.
-- Frontend conectado con FastAPI mediante el proxy de Vite.
-- Inventario de checkpoints locales disponible en GET /api/rocket-ai/models.
-- Selector de modelos en React con carga, validación de respuestas y manejo de errores.
-- Grabación de trayectorias físicas y persistencia en JSON con identificación del checkpoint y versiones.
-- Recuperación de episodios guardados mediante GET /api/rocket-ai/episodes/{episode_id}.
-- Comprobación de conexión con estados de espera, éxito y error, y posibilidad de reintentar.
-- Consulta de episodios guardados por modelo mediante `GET /api/rocket-ai/episodes`.
-- Selector de episodios en React con validación de las respuestas mediante Zod.
-- Descarga de trayectorias completas con validación mediante Zod e identificación del episodio y modelo.
-- Visualización en Canvas del terreno, plataforma y nave usando las coordenadas grabadas del simulador.
-- Reproducción según los FPS del episodio, con pausa, deslizador y reinicio al finalizar.
-- Persistencia de evaluaciones con resultados por episodio, pasos de entrenamiento, hash del checkpoint y versiones.
-- Consulta del listado de evaluaciones por modelo y recuperación de su detalle mediante la API.
-- Selección de evaluaciones por modelo y visualización de sus métricas con validación de datos mediante Zod.
-- Gráficas de recompensa original y duración por seed, y porcentaje de aterrizajes exitosos y no exitosos.
-- Carga de las gráficas bajo demanda mediante React.lazy y Suspense.
-- Wrapper de penalización temporal configurable, con registro separado de recompensa original, adicional y total, validado mediante dos pruebas de integración.
-- Entorno local verificado con NumPy 2.3.5, pygame-ce 2.5.6 y Smart App Control activo.
-- Entrenamiento configurable por consola, con protección contra sobrescritura de checkpoints.
-- Registro de configuración y versiones en JSON, y métricas en CSV con retornos original, adicional y total separados por episodio.
-- Métrica de aterrizaje basada en contactos físicos activos de Box2D, con pruebas de regresión y comparación documentada entre referencia y penalización temporal.
-- Reward shaping configurable por consola: penalización temporal, premio por estabilidad y recompensa por progreso, con comparación de cuatro configuraciones y replays de éxitos y fallos.
-- Consulta de entrenamientos por modelo y lectura de métricas reales desde los CSV de PPO mediante la API.
-- Selector de entrenamientos, curvas de recompensa y duración, resumen del último registro y tabla numérica, con validación mediante Zod y carga diferida de las gráficas.
-- Cinco perfiles PPO (Precision, Speed, Efficiency, Stability y Balanced) preentrenados en condiciones neutras con un presupuesto común de 1.024.000 pasos; resultados y limitaciones en el [registro de experimentos](docs/experiment-results.md).
-- Métricas por episodio de error horizontal final, costo relativo de motores y movimiento previo al contacto, con tabla en la web y compatibilidad con evaluaciones antiguas.
+- **Laboratorio neutral.** Entrenamiento y evaluación por consola.
+  La web permite consultar métricas y reproducir trayectorias grabadas
+  del simulador.
+- **Cinco especialidades.** Precision, Speed, Efficiency, Stability y
+  Balanced parten de checkpoints preentrenados en condiciones neutras
+  con el mismo presupuesto de entrenamiento.
+- **Desafío de adaptación.** La interfaz permite crear experimentos con
+  presets y ajustar gravedad, ancho de plataforma, límite de pasos y
+  combustible. Cada agente parte de su checkpoint y recibe un presupuesto
+  de entrenamiento adicional.
+- **Seguimiento y comparación.** Un worker procesa los trabajos en
+  secuencia. La interfaz muestra progreso por SSE, curvas de evaluación
+  y una tabla con los pasos hasta el criterio cuando se confirma.
+- **Persistencia.** SQLite conserva los trabajos y sus eventos. El UUID
+  del experimento permite recuperar la tabla y las curvas al volver a
+  abrir la interfaz.
+
+El [registro de experimentos](docs/experiment-results.md) recoge las
+evaluaciones de los modelos y sus limitaciones.
 
 ## Ejecutar en desarrollo
 
-Mantener ambos servidores activos en terminales separadas.
+Arranca la API con los comandos de [Crear y cancelar por HTTP](#crear-y-cancelar-por-http).
+Esa sección incluye la preparación de la credencial local para crear experimentos.
 
-### Backend
-
-Desde la carpeta backend:
-
-```powershell
-& .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
-```
-
-### Frontend
-
-Desde la carpeta frontend:
+En otra terminal de PowerShell, desde `frontend`, inicia Vite.
 
 ```powershell
 npm run dev
 ```
 
-Abrir http://127.0.0.1:5173 y pulsar «Comprobar conexión».
-El proxy de desarrollo reenvía las rutas /api a FastAPI en el puerto 8000.
+Abre [Rocket RL Lab](http://127.0.0.1:5173). El proxy de Vite dirige
+las solicitudes de `/api` a FastAPI en el puerto 8000.
+
+Para procesar experimentos de adaptación, inicia el [worker](#worker)
+en una tercera terminal.
+
+### Usar el desafío de adaptación
+
+1. Abre **Desafío de adaptación** y pulsa **Cargar agentes** para
+   comprobar que estén disponibles los cinco checkpoints.
+2. Desde `backend`, en una terminal libre, copia la credencial local
+   al portapapeles.
+
+   ```powershell
+   Set-Clipboard -Value (
+       (Get-Content -LiteralPath .\.env.operator-token -Raw).Trim()
+   )
+   ```
+
+   Pégala con `Ctrl+V` en **Credencial de operador**.
+3. Elige el escenario y el presupuesto. Para una primera ejecución,
+   selecciona **Solo evaluación (0 pasos adicionales)** y pulsa
+   **Crear experimento**.
+4. Guarda el UUID que aparece junto a **Experimento**. Para recuperar
+   la tabla y las curvas, introdúcelo en **Consultar experimento**.
+   La consulta está disponible sin credencial.
 
 ## Entrenamiento por consola
 
@@ -287,7 +282,10 @@ Los errores internos se registran en el servidor y se devuelven
 con un mensaje público breve.
 
 La API inicializa el esquema al arrancar.
-La transmisión de eventos por HTTP está pendiente de integración.
+`GET /api/adaptation/experiments/{experiment_id}/events` transmite los
+eventos mediante SSE. La interfaz recupera el historial de evaluaciones
+y aplica las actualizaciones en vivo. Cuando todos los trabajos terminan,
+el servidor envía el evento `end` y la interfaz cierra la conexión.
 
 ### Crear y cancelar por HTTP
 
