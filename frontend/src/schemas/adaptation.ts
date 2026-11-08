@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { episodeTrajectorySchema } from './episodes'
+
 export const adaptationAgentIdSchema = z.enum([
   'precision',
   'speed',
@@ -7,6 +9,21 @@ export const adaptationAgentIdSchema = z.enum([
   'stability',
   'balanced',
 ])
+
+export const adaptationReplaysSchema = z
+  .object({
+    schema_version: z.literal(1),
+    experiment_id: z.string().regex(/^[a-f0-9]{32}$/),
+    agent: adaptationAgentIdSchema,
+    extra_training_timesteps: z.number().int().nonnegative(),
+    before: episodeTrajectorySchema,
+    after: episodeTrajectorySchema,
+  })
+  .refine((pair) => pair.before.seed === pair.after.seed, {
+    message: 'Los dos replays deben usar la misma semilla.',
+  })
+
+export type AdaptationReplays = z.infer<typeof adaptationReplaysSchema>
 
 export const adaptationAgentSchema = z.object({
   id: adaptationAgentIdSchema,

@@ -26,7 +26,7 @@ const frameSnapshotSchema = z.object({
   legs: z.tuple([polygonSchema, polygonSchema]),
 })
 
-const episodeTrajectorySchema = episodeSummarySchema
+export const episodeTrajectorySchema = episodeSummarySchema
   .omit({ id: true, model_id: true })
   .extend({
     terminated: z.boolean(),
@@ -51,6 +51,7 @@ export const episodeRecordSchema = z.object({
   episode: episodeTrajectorySchema,
 })
 
+export type EpisodeTrajectory = z.infer<typeof episodeTrajectorySchema>
 export type Point = z.infer<typeof pointSchema>
 export type SceneSnapshot = z.infer<typeof sceneSnapshotSchema>
 export type FrameSnapshot = z.infer<typeof frameSnapshotSchema>

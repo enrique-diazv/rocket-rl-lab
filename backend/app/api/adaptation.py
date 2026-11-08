@@ -20,7 +20,9 @@ from app.storage.job_queue import (
 )
 from typing import Annotated
 
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
+
+from app.storage.adaptations import adaptation_replays_path
 
 from app.api.adaptation_stream import stream_adaptation_events
 
@@ -106,6 +108,24 @@ def cancel_experiment(
             status_code=500,
             detail="No se pudo solicitar la cancelación.",
         ) from error
+
+@router.get(
+    "/experiments/{experiment_id}/replays/{agent}",
+    response_class=FileResponse,
+    responses={200: {"content": {"application/json": {}}}},
+)
+def get_experiment_replays(experiment_id: UUID, agent: str) -> FileResponse:
+    try:
+        path = adaptation_replays_path(experiment_id, agent)
+        if not path.is_file():
+            raise FileNotFoundError(path)
+    except (FileNotFoundError, ValueError) as error:
+        raise HTTPException(
+            status_code=404,
+            detail="Replays no disponibles para este agente.",
+        ) from error
+
+    return FileResponse(path, media_type="application/json")
 
 _MAX_EVENT_ID = 2**63 - 1
 

@@ -2,6 +2,8 @@ from stable_baselines3 import PPO
 
 from app.rl.env_factory import create_lander_env
 from app.rl.landing_metrics import is_successful_landing
+from app.rl.scenario_config import ScenarioConfig
+from app.rl.scenario_env import create_scenario_env
 from app.rl.trajectory import (
     EpisodeTrajectory,
     capture_frame,
@@ -9,8 +11,13 @@ from app.rl.trajectory import (
 )
 
 
-def record_episode(model: PPO, *, seed: int) -> EpisodeTrajectory:
-    env = create_lander_env()
+def record_episode(
+    model: PPO,
+    *,
+    seed: int,
+    scenario: ScenarioConfig | None = None,
+) -> EpisodeTrajectory:
+    env = create_lander_env() if scenario is None else create_scenario_env(scenario)
 
     try:
         observation, _ = env.reset(seed=seed)
@@ -25,9 +32,7 @@ def record_episode(model: PPO, *, seed: int) -> EpisodeTrajectory:
                 observation,
                 deterministic=True,
             )
-            observation, reward, terminated, truncated, _ = (
-                env.step(action.item())
-            )
+            observation, reward, terminated, truncated, _ = env.step(action.item())
             total_reward += float(reward)
             frames.append(capture_frame(env))
 

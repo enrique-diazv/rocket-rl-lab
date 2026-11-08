@@ -1,7 +1,7 @@
+from __future__ import annotations
 from pathlib import Path
 from uuid import UUID, uuid4
 
-from stable_baselines3 import PPO
 
 from app.rl.agent_profiles import AGENT_PROFILES
 
@@ -11,7 +11,7 @@ from hashlib import sha256
 from importlib.metadata import version
 import json
 from platform import python_version
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.rl.adaptation_config import AdaptationConfig
 from app.rl.adaptation_protocol import (
@@ -26,6 +26,11 @@ ADAPTATION_DIRECTORY = (
     Path(__file__).resolve().parents[2] / "experiments" / "adaptations"
 )
 from app.rl.adaptation_metrics import AdaptationEvaluation, AdaptationResult
+
+if TYPE_CHECKING:
+    from stable_baselines3 import PPO
+
+    from app.rl.trajectory import EpisodeTrajectory
 
 def adaptation_checkpoint_path(
     experiment_id: UUID,
@@ -226,4 +231,40 @@ def save_adaptation_result(
     }
 
     _write_json_record(destination, payload)
+    return destination
+
+def adaptation_replays_path(experiment_id: UUID, agent: str) -> Path:
+    if agent not in AGENT_PROFILES:
+        raise ValueError("Agente desconocido.")
+
+    root = ADAPTATION_DIRECTORY.resolve()
+    path = root / experiment_id.hex / agent / "replays.json"
+    if path.resolve() != path:
+        raise ValueError("La ruta del replay debe coincidir con la del experimento.")
+
+    return path
+
+def save_adaptation_replays(
+    *,
+    experiment_id: UUID,
+    agent: str,
+    extra_training_timesteps: int,
+    before: EpisodeTrajectory,
+    after: EpisodeTrajectory,
+) -> Path:
+    if before.seed != after.seed:
+        raise ValueError("Las dos trayectorias deben usar la misma semilla.")
+
+    destination = adaptation_replays_path(experiment_id, agent)
+    _write_json_record(
+        destination,
+        {
+            "schema_version": 1,
+            "experiment_id": experiment_id.hex,
+            "agent": agent,
+            "extra_training_timesteps": extra_training_timesteps,
+            "before": asdict(before),
+            "after": asdict(after),
+        },
+    )
     return destination

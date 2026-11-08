@@ -2,9 +2,12 @@ import {
   adaptationAgentsSchema,
   adaptationExperimentRequestSchema,
   adaptationExperimentSchema,
+  adaptationReplaysSchema,
   type AdaptationAgent,
   type AdaptationExperiment,
   type AdaptationExperimentRequest,
+  type AdaptationReplays,
+
 } from '../schemas/adaptation'
 
 const experimentsPath = '/api/adaptation/experiments'
@@ -118,6 +121,37 @@ export async function getAdaptationExperiment(
   }
 
   return readExperimentSnapshot(response, id)
+}
+
+export async function getAdaptationReplays(
+  experimentId: string,
+  agent: AdaptationAgent['id'],
+): Promise<AdaptationReplays> {
+  const id = parseExperimentId(experimentId)
+  const path = `${experimentsPath}/${id}/replays/${encodeURIComponent(agent)}`
+  const response = await fetch(path, {
+    signal: AbortSignal.timeout(10000),
+  })
+
+  if (response.status === 404) {
+    throw new Error('No hay replays guardados para este agente.')
+  }
+
+  if (!response.ok) {
+    throw new Error(`El backend respondió con HTTP ${response.status}.`)
+  }
+
+  const body: unknown = await response.json()
+  const parsed = adaptationReplaysSchema.safeParse(body)
+  if (!parsed.success) {
+    throw new Error('Los replays tienen un formato inesperado.')
+  }
+
+  if (parsed.data.experiment_id !== id.replace(/-/g, '') || parsed.data.agent !== agent) {
+    throw new Error('Los replays no corresponden al agente y experimento solicitados.')
+  }
+
+  return parsed.data
 }
 
 export async function createAdaptationExperiment(

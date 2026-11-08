@@ -7,6 +7,7 @@ import { AdaptationJobCard } from './AdaptationJobCard'
 import { lazy, Suspense } from 'react'
 import { AdaptationComparisonTable } from './AdaptationComparisonTable'
 import { AdaptationCancelButton } from './AdaptationCancelButton'
+import { AdaptationReplayComparison } from './AdaptationReplayComparison'
 
 const AdaptationChart = lazy(() =>
   import('./AdaptationChart').then((chartModule) => ({
@@ -123,6 +124,11 @@ export function AdaptationExperimentLive({
           </Suspense>
         )}
       </section>
+
+      <AdaptationReplayComparison
+        experimentId={experiment.id}
+        jobs={experiment.jobs}
+      />
 
     </div>
   )

@@ -1,3 +1,8 @@
+import logging
+from collections.abc import Callable, Sequence
+from time import perf_counter
+from uuid import UUID
+from app.rl.adaptation_replays import record_adaptation_replays
 from collections.abc import Callable, Sequence
 from time import perf_counter
 from uuid import UUID
@@ -19,6 +24,7 @@ from app.storage.adaptations import (
     save_adaptation_checkpoint,
     save_adaptation_evaluation,
     save_adaptation_result,
+    save_adaptation_replays,
 )
 from app.rl.adaptation_protocol import (
     ADAPTATION_EVALUATION_SEEDS,
@@ -30,6 +36,8 @@ from app.rl.adaptation_training import (
     adaptation_model,
     train_adaptation_block,
 )
+
+logger = logging.getLogger(__name__)
 
 class AdaptationSession:
     _model: PPO
@@ -135,15 +143,35 @@ class AdaptationSession:
             status=status,
             evaluations=tuple(self._evaluations),
             time_to_threshold_steps=(
-                None
-                if status == "budget_reached"
-                else self._extra_steps()
+                None if status == "budget_reached" else self._extra_steps()
             ),
         )
         save_adaptation_result(
             result,
             experiment_id=self._experiment_id,
         )
+        extra_steps = result.evaluations[-1].extra_training_timesteps
+        try:
+            before, after = record_adaptation_replays(
+                experiment_id=self._experiment_id,
+                agent=self._agent,
+                scenario=self._config.scenario,
+                extra_training_timesteps=extra_steps,
+                seed=result.evaluations[0].episodes[0].seed,
+            )
+            save_adaptation_replays(
+                experiment_id=self._experiment_id,
+                agent=self._agent,
+                extra_training_timesteps=extra_steps,
+                before=before,
+                after=after,
+            )
+        except (OSError, RuntimeError, ValueError):
+            logger.exception(
+                "No se pudieron guardar los replays de %s en %s.",
+                self._agent,
+                self._experiment_id.hex,
+            )
         self._emit(status)
         return result
 
