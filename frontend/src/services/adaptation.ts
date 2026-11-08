@@ -1,11 +1,87 @@
-import {type AdaptationAgent, adaptationAgentsSchema, type AdaptationExperiment, type AdaptationExperimentRequest, adaptationExperimentRequestSchema, adaptationExperimentSchema,} from '../schemas/adaptation'
+import {
+  adaptationAgentsSchema,
+  adaptationExperimentRequestSchema,
+  adaptationExperimentSchema,
+  type AdaptationAgent,
+  type AdaptationExperiment,
+  type AdaptationExperimentRequest,
+} from '../schemas/adaptation'
 
-const adaptationMutationErrors: Partial<Record<number, string>> = {
+const experimentsPath = '/api/adaptation/experiments'
+
+const mutationErrors: Partial<Record<number, string>> = {
   401: 'Credencial de operador inválida.',
+  404: 'Experimento no encontrado.',
   409: 'Ya existe un experimento pendiente o en ejecución.',
   422: 'El backend rechazó los datos de la solicitud.',
   503: 'Las operaciones de escritura no están configuradas.',
 }
+
+function parseExperimentId(experimentId: string): string {
+  const parsed = adaptationExperimentSchema.shape.id.safeParse(
+    experimentId.trim().toLowerCase(),
+  )
+
+  if (!parsed.success) {
+    throw new Error('Introduce un UUID de experimento válido.')
+  }
+
+  return parsed.data
+}
+
+async function readExperimentSnapshot(
+  response: Response,
+  expectedId?: string,
+): Promise<AdaptationExperiment> {
+  const responseBody: unknown = await response.json()
+  const parsed = adaptationExperimentSchema.safeParse(responseBody)
+
+  if (!parsed.success) {
+    throw new Error('El estado del experimento tiene un formato inesperado.')
+  }
+
+  if (expectedId !== undefined && parsed.data.id !== expectedId) {
+    throw new Error('La respuesta no corresponde al experimento solicitado.')
+  }
+
+  return parsed.data
+}
+
+async function postAdaptationMutation(
+  path: string,
+  operatorToken: string,
+  config?: AdaptationExperimentRequest,
+): Promise<Response> {
+  const token = operatorToken.trim()
+
+  if (!token) {
+    throw new Error('Introduce la credencial de operador.')
+  }
+
+  const headers = new Headers({ Authorization: `Bearer ${token}` })
+  const request: RequestInit = {
+    method: 'POST',
+    headers,
+    signal: AbortSignal.timeout(10000),
+  }
+
+  if (config !== undefined) {
+    headers.set('Content-Type', 'application/json')
+    request.body = JSON.stringify(config)
+  }
+
+  const response = await fetch(path, request)
+
+  if (response.status !== 202) {
+    throw new Error(
+      mutationErrors[response.status] ??
+        `El backend respondió con HTTP ${response.status}.`,
+    )
+  }
+
+  return response
+}
+
 export async function getAdaptationAgents(): Promise<AdaptationAgent[]> {
   const response = await fetch('/api/adaptation/agents', {
     signal: AbortSignal.timeout(5000),
@@ -15,33 +91,23 @@ export async function getAdaptationAgents(): Promise<AdaptationAgent[]> {
     throw new Error(`El backend respondió con HTTP ${response.status}.`)
   }
 
-  const data: unknown = await response.json()
-  const parsed = adaptationAgentsSchema.safeParse(data)
+  const responseBody: unknown = await response.json()
+  const parsed = adaptationAgentsSchema.safeParse(responseBody)
 
   if (!parsed.success) {
-    throw new Error(
-        'El catálogo de agentes tiene un formato inesperado.',
-    )
+    throw new Error('El catálogo de agentes tiene un formato inesperado.')
   }
 
   return parsed.data
 }
 
 export async function getAdaptationExperiment(
-    experimentId: string,
-    ): Promise<AdaptationExperiment> {
-  const parsedId = adaptationExperimentSchema.shape.id.safeParse(
-      experimentId.trim().toLowerCase(),
-  )
-
-  if (!parsedId.success) {
-    throw new Error('Introduce un UUID de experimento válido.')
-  }
-
-  const response = await fetch(
-      `/api/adaptation/experiments/${encodeURIComponent(parsedId.data)}`,
-      {signal: AbortSignal.timeout(5000)},
-  )
+  experimentId: string,
+): Promise<AdaptationExperiment> {
+  const id = parseExperimentId(experimentId)
+  const response = await fetch(`${experimentsPath}/${encodeURIComponent(id)}`, {
+    signal: AbortSignal.timeout(5000),
+  })
 
   if (response.status === 404) {
     throw new Error('Experimento no encontrado.')
@@ -51,66 +117,37 @@ export async function getAdaptationExperiment(
     throw new Error(`El backend respondió con HTTP ${response.status}.`)
   }
 
-  const data: unknown = await response.json()
-  const parsed = adaptationExperimentSchema.safeParse(data)
-
-  if (!parsed.success) {
-    throw new Error(
-        'El estado del experimento tiene un formato inesperado.',
-    )
-  }
-
-  if (parsed.data.id !== parsedId.data) {
-    throw new Error(
-        'La respuesta no corresponde al experimento solicitado.',
-    )
-  }
-
-  return parsed.data
+  return readExperimentSnapshot(response, id)
 }
 
 export async function createAdaptationExperiment(
   config: AdaptationExperimentRequest,
   operatorToken: string,
 ): Promise<AdaptationExperiment> {
-  const parsedRequest = adaptationExperimentRequestSchema.safeParse(config)
+  const parsed = adaptationExperimentRequestSchema.safeParse(config)
 
-  if (!parsedRequest.success) {
+  if (!parsed.success) {
     throw new Error('La configuración no cumple los límites permitidos.')
   }
 
-  const token = operatorToken.trim()
+  const response = await postAdaptationMutation(
+    experimentsPath,
+    operatorToken,
+    parsed.data,
+  )
 
-  if (!token) {
-    throw new Error('Introduce la credencial de operador.')
-  }
+  return readExperimentSnapshot(response)
+}
 
-  const response = await fetch('/api/adaptation/experiments', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(parsedRequest.data),
-    signal: AbortSignal.timeout(10000),
-  })
+export async function cancelAdaptationExperiment(
+  experimentId: string,
+  operatorToken: string,
+): Promise<AdaptationExperiment> {
+  const id = parseExperimentId(experimentId)
+  const response = await postAdaptationMutation(
+    `${experimentsPath}/${encodeURIComponent(id)}/cancel`,
+    operatorToken,
+  )
 
-  if (response.status !== 202) {
-    throw new Error(
-      adaptationMutationErrors[response.status] ??
-        `El backend respondió con HTTP ${response.status}.`,
-    )
-  }
-
-  const responseBody: unknown = await response.json()
-  const parsedExperiment =
-    adaptationExperimentSchema.safeParse(responseBody)
-
-  if (!parsedExperiment.success) {
-    throw new Error(
-      'La respuesta de creación tiene un formato inesperado.',
-    )
-  }
-
-  return parsedExperiment.data
+  return readExperimentSnapshot(response, id)
 }

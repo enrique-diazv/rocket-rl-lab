@@ -6,6 +6,7 @@ import {
 import { AdaptationJobCard } from './AdaptationJobCard'
 import { lazy, Suspense } from 'react'
 import { AdaptationComparisonTable } from './AdaptationComparisonTable'
+import { AdaptationCancelButton } from './AdaptationCancelButton'
 
 const AdaptationChart = lazy(() =>
   import('./AdaptationChart').then((chartModule) => ({
@@ -23,10 +24,12 @@ const connectionLabels: Record<AdaptationConnectionStatus, string> = {
 
 type AdaptationExperimentLiveProps = {
   initialExperiment: AdaptationExperiment
+  operatorToken: string
 }
 
 export function AdaptationExperimentLive({
   initialExperiment,
+  operatorToken,
 }: AdaptationExperimentLiveProps) {
   const {
     experiment,
@@ -54,6 +57,14 @@ export function AdaptationExperimentLive({
         {experiment.config.max_additional_timesteps.toLocaleString('es-MX')}{' '}
         pasos.
       </p>
+
+      {!experiment.cancel_requested &&
+        experiment.jobs.some((job) => job.finished_at === null) && (
+          <AdaptationCancelButton
+            experimentId={experiment.id}
+            operatorToken={operatorToken}
+          />
+        )}
 
       {experiment.cancel_requested && (
         <p>Se solicitó la cancelación de este experimento.</p>

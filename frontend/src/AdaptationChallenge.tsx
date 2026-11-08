@@ -101,6 +101,7 @@ function AdaptationChallenge() {
         <AdaptationExperimentLive
           key={experiment.id}
           initialExperiment={experiment}
+          operatorToken={operatorToken}
         />
       )}
     </main>
