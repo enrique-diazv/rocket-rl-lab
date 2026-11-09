@@ -14,3 +14,14 @@ export const adaptationStatusLabels: Record<
   failed: 'Error',
   cancelled: 'Cancelado',
 }
+
+export function formatThresholdSteps(job: AdaptationJob): string {
+  const steps = job.progress?.time_to_threshold_steps
+  if (steps != null) {
+    return steps.toLocaleString('es-MX')
+  }
+
+  return job.status === 'budget_reached'
+    ? 'No alcanzado'
+    : 'Sin confirmar'
+}

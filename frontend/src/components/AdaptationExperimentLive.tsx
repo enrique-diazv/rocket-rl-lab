@@ -8,6 +8,7 @@ import { lazy, Suspense } from 'react'
 import { AdaptationComparisonTable } from './AdaptationComparisonTable'
 import { AdaptationCancelButton } from './AdaptationCancelButton'
 import { AdaptationReplayComparison } from './AdaptationReplayComparison'
+import { AdaptationCriterionChart } from './AdaptationCriterionChart'
 
 const AdaptationChart = lazy(() =>
   import('./AdaptationChart').then((chartModule) => ({
@@ -86,6 +87,9 @@ export function AdaptationExperimentLive({
         </p>
 
         <AdaptationComparisonTable jobs={experiment.jobs} />
+
+        <AdaptationCriterionChart jobs={experiment.jobs} />
+
       </section>
 
       <section aria-labelledby="adaptation-charts-title">

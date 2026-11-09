@@ -1,6 +1,5 @@
 import type { AdaptationJob } from '../schemas/adaptation'
-import { adaptationStatusLabels } from '../presentation/adaptation'
-
+import { adaptationStatusLabels, formatThresholdSteps } from '../presentation/adaptation'
 const columns = [
   'Agente',
   'Estado',
@@ -18,18 +17,6 @@ const cellStyle = {
 
 type AdaptationComparisonTableProps = {
   jobs: AdaptationJob[]
-}
-
-function formatThresholdSteps(job: AdaptationJob): string {
-  const steps = job.progress?.time_to_threshold_steps
-
-  if (steps != null) {
-    return steps.toLocaleString('es-MX')
-  }
-
-  return job.status === 'budget_reached'
-    ? 'No alcanzado'
-    : 'Sin confirmar'
 }
 
 export function AdaptationComparisonTable({
