@@ -1,184 +1,295 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+.app-header__inner, .workspace {
+  width: min(100%, 1540px);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
-#center {
+.app-header__inner {
   display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  align-items: center;
+  gap: clamp(20px, 4vw, 56px);
+  min-height: 62px;
 }
 
-#next-steps {
+.app-brand {
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  align-items: center;
+  gap: 9px;
+  color: var(--text-h);
+  font: 600 19px/1 var(--display);
+  white-space: nowrap;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
+.app-scope { margin-left: auto; font-size: 12px; white-space: nowrap; }
 
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
+.app-nav { display: flex; align-self: stretch; gap: 24px; }
 
-#next-steps ul {
-  list-style: none;
+.app-nav button {
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  border-radius: 0;
   padding: 0;
+  white-space: nowrap;
+}
+
+.app-nav button:hover:enabled { background: transparent; color: var(--text-h); }
+.app-nav button[aria-pressed="true"] { color: var(--text-h); }
+
+.app-nav button span {
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  align-items: center;
+  height: 100%;
+  border-bottom: 1px solid transparent;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.app-nav button[aria-pressed="true"] span { border-bottom-color: var(--accent); }
+
+.workspace {
+  display: grid;
+  gap: var(--gap);
+  padding-block: 26px 40px;
 }
 
-.ticks {
-  position: relative;
+.workspace-heading, .panel-heading, .connection-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workspace-heading p { margin-top: 6px; }
+.connection-check { flex-wrap: wrap; font-size: 13px; }
+.connection-check p { margin-top: 0; }
+.lookup-shortcut { display: none; }
+
+.panel, .flight-controls > section {
+  min-width: 0;
+  padding: clamp(14px, 2vw, 22px);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.panel > :where(* + *), .flight-controls > section > :where(* + *) { margin-top: 12px; }
+.panel-heading { flex-wrap: wrap; }
+
+.flight-desk, .command-desk, .neutral-records, .chart-pair, .replay-pair {
+  display: grid;
+  align-items: start;
+  gap: var(--gap);
+}
+
+/* One workspace edge on each side: the two tracks and one gutter use the full grid. */
+.flight-desk { grid-template-columns: minmax(220px, 0.8fr) minmax(0, 2.2fr); }
+.command-desk { grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr); }
+.neutral-records, .chart-pair, .replay-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.neutral-records { align-items: stretch; }
+.flight-controls, .command-sidebar, .experiment-report { display: grid; gap: var(--gap); min-width: 0; }
+
+.flight-placeholder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.55fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 220px;
+  padding: 12px 18px;
+  background: #111214;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.flight-placeholder img {
+  display: block;
   width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+}
+.flight-placeholder figcaption { display: grid; gap: 6px; }
+.flight-placeholder strong { color: var(--text-h); font-size: 15px; }
+.flight-placeholder figcaption span { font-size: 13px; }
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.flight-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 470px;
+  object-fit: contain;
+  background: #111214;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.flight-playback { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); }
+.flight-transport { display: flex; align-items: center; gap: 14px; padding: 10px 12px; }
+.flight-transport label { flex: 1; min-width: 0; font-size: 12px; }
+
+.flight-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  background: var(--raised);
+  border-top: 1px solid var(--border);
+}
+
+.flight-stats > div { padding: 9px 10px; min-width: 0; }
+.flight-stats > div + div { border-inline-start: 1px solid var(--border); }
+.flight-stats dt { font-size: 12px; }
+.flight-stats dd { color: var(--text-h); font: 500 16px/1.4 var(--display); }
+
+.record-panel { min-width: 0; }
+.record-panel > section > :where(* + *) { margin-top: 10px; }
+.record-panel > section + section { padding-top: 14px; border-top: 1px solid var(--border); }
+.record-panel section > div > p + p { margin-top: 3px; }
+
+.command-form form { display: grid; gap: 16px; }
+
+.scenario-preset, .input-action {
+  display: grid;
+  align-items: end;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.command-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.command-form fieldset > p { grid-column: 1 / -1; }
+.command-form fieldset p, .operator-access > p { font-size: 13px; margin-top: 4px; }
+
+.operator-access { padding-top: 12px; border-top: 1px solid var(--border); }
+.operator-access .input-action { margin-top: 9px; }
+
+.experiment-lookup form { display: grid; gap: 8px; }
+.experiment-lookup button { justify-self: start; }
+
+.agent-catalog ul { list-style: none; padding: 0; margin-bottom: 0; }
+
+.agent-catalog li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.agent-catalog li:last-child { border: 0; }
+.agent-catalog strong { color: var(--text-h); }
+.agent-catalog li span { font-size: 13px; }
+.experiment-summary [role="status"] { color: var(--text-h); }
+.experiment-summary button { margin-top: 5px; }
+
+.agent-progress__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  background: var(--raised);
+  border-radius: var(--radius);
+}
+
+.agent-job { min-width: 0; padding: 12px; }
+.agent-job + .agent-job { border-inline-start: 1px solid var(--border); }
+.agent-job > :where(* + *) { margin-top: 8px; }
+.agent-job__status { font-size: 12px; color: var(--text-h); }
+.agent-job__status[data-status="failed"] { color: var(--error); }
+.agent-job dt, .agent-job__evaluation p { font-size: 12px; }
+.agent-job dd { margin-bottom: 5px; color: var(--text-h); }
+.agent-job__evaluation { padding-top: 8px; border-top: 1px solid var(--border); }
+.agent-job__evaluation h4 { margin-bottom: 6px; }
+
+.workspace table { color: var(--text-h); font-variant-numeric: tabular-nums; }
+.workspace table caption { color: var(--text); text-align: left; margin-bottom: 6px; }
+.workspace table th, .workspace table td { border-bottom: 1px solid var(--border); }
+.workspace table th[scope="col"] { color: var(--text); font-size: 12px; font-weight: 500; }
+.workspace table tbody tr:hover { background: var(--raised); }
+
+.criterion-chart {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.criterion-chart figcaption p, .adaptation-chart figcaption p { margin-top: 4px; font-size: 13px; }
+.criterion-chart ul { list-style: none; padding: 0; margin: 8px 0 0; }
+
+.criterion-chart li {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) 7rem;
+  align-items: center;
+  gap: 8px;
+  min-height: 29px;
+}
+
+.criterion-chart li > :last-child { text-align: right; }
+.criterion-chart__track { display: flex; align-items: center; height: 14px; border-bottom: 1px solid var(--border); }
+.criterion-chart__bar { height: 6px; background: var(--accent); }
+.criterion-chart__bar[data-zero="true"] { border-inline-start: 2px solid var(--accent); }
+
+.adaptation-chart { min-width: 0; }
+.adaptation-plot { height: 265px; font-size: 12px; }
+.adaptation-chart figcaption { margin-bottom: 5px; }
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+
+.chart-key li { display: inline-flex; align-items: center; gap: 5px; }
+.recharts-legend-wrapper { font-size: 12px; }
+.recharts-default-tooltip { color: #171719; }
+
+.replay-select { max-width: 440px; }
+.replay-pair > section { min-width: 0; }
+.replay-pair h3 { margin-bottom: 8px; }
+
+@media (max-width: 1160px) {
+  .agent-progress__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .agent-job:nth-child(4) { grid-column: span 2; border-inline-start: 0; }
+  .agent-job:nth-child(n + 4) { border-top: 1px solid var(--border); }
+}
+
+@media (max-width: 830px) {
+  .workspace-heading { align-items: flex-start; flex-direction: column; }
+  .app-scope { display: none; }
+  .command-desk { grid-template-columns: minmax(0, 1fr); }
+  .command-sidebar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chart-pair, .replay-pair { grid-template-columns: minmax(0, 1fr); }
+  .lookup-shortcut { display: inline-flex; align-items: center; min-height: 36px; color: var(--text-h); }
+}
+
+@media (max-width: 640px) {
+  :root { --gap: 14px; }
+  .app-header__inner { flex-wrap: wrap; gap: 0 18px; }
+  .app-brand { width: 100%; min-height: 46px; }
+  .app-nav { max-width: 100%; gap: 18px; }
+  .app-nav button { font-size: 13px; }
+  .workspace { padding-block: 17px 28px; }
+  .flight-desk, .neutral-records, .command-sidebar { grid-template-columns: minmax(0, 1fr); }
+  .flight-placeholder { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .flight-placeholder img { max-height: 146px; object-fit: contain; }
+  .scenario-preset { grid-template-columns: minmax(0, 1fr); }
+  .scenario-preset button { justify-self: start; }
+  .agent-progress__grid { grid-template-columns: minmax(0, 1fr); }
+  .agent-job + .agent-job { border-inline-start: 0; border-top: 1px solid var(--border); }
+  .agent-job:nth-child(4) { grid-column: auto; }
+  .flight-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .flight-stats > div:nth-child(n + 4) { border-top: 1px solid var(--border); }
+  .flight-stats > div:nth-child(4) { border-inline-start: 0; }
+  .flight-stats > div:last-child { grid-column: span 2; }
+  .lookup-shortcut { min-height: 44px; }
+  .command-form fieldset label { align-content: end; min-height: 2.6em; }
+  .flight-transport input[type="range"] { min-height: 26px; }
+  .adaptation-plot { height: 242px; }
+}
+
+@media (max-width: 350px) {
+  .flight-controls, .command-form fieldset, .input-action { grid-template-columns: minmax(0, 1fr); }
 }

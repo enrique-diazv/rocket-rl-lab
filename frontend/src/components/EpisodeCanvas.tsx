@@ -29,14 +29,9 @@ export function EpisodeCanvas({
       ref={canvasRef}
       width={600}
       height={400}
+      className="flight-canvas"
       role="img"
       aria-label="Escenario y posición de la nave en el episodio grabado"
-      style={{
-        display: 'block',
-        width: '100%',
-        maxWidth: 600,
-        height: 'auto',
-      }}
     >
       Tu navegador necesita soporte para Canvas.
     </canvas>

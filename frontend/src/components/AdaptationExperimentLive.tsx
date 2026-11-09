@@ -46,37 +46,45 @@ export function AdaptationExperimentLive({
   )
 
   return (
-    <div>
-      <p role="status">{connectionLabels[connectionStatus]}</p>
-      {error && <p role="alert">{error}</p>}
+    <div className="experiment-report">
+      <section className="panel experiment-summary" aria-labelledby="experiment-summary-title">
+        <h2 id="experiment-summary-title">Seguimiento del experimento</h2>
+        <p role="status">{connectionLabels[connectionStatus]}</p>
+        {error && <p role="alert">{error}</p>}
 
-      <p>
-        Experimento: <code>{experiment.id}</code>
-      </p>
+        <p>
+          Experimento: <code>{experiment.id}</code>
+        </p>
 
-      <p>
-        Presupuesto adicional por agente:{' '}
-        {experiment.config.max_additional_timesteps.toLocaleString('es-MX')}{' '}
-        pasos.
-      </p>
+        <p>
+          Presupuesto adicional por agente:{' '}
+          {experiment.config.max_additional_timesteps.toLocaleString('es-MX')}{' '}
+          pasos.
+        </p>
 
-      {!experiment.cancel_requested &&
-        experiment.jobs.some((job) => job.finished_at === null) && (
-          <AdaptationCancelButton
-            experimentId={experiment.id}
-            operatorToken={operatorToken}
-          />
+        {!experiment.cancel_requested &&
+          experiment.jobs.some((job) => job.finished_at === null) && (
+            <AdaptationCancelButton
+              experimentId={experiment.id}
+              operatorToken={operatorToken}
+            />
+          )}
+
+        {experiment.cancel_requested && (
+          <p>Se solicitó la cancelación de este experimento.</p>
         )}
+      </section>
 
-      {experiment.cancel_requested && (
-        <p>Se solicitó la cancelación de este experimento.</p>
-      )}
+      <section className="panel agent-progress" aria-labelledby="agent-progress-title">
+        <h2 id="agent-progress-title">Progreso por agente</h2>
+        <div className="agent-progress__grid">
+          {experiment.jobs.map((job) => (
+            <AdaptationJobCard key={job.id} job={job} />
+          ))}
+        </div>
+      </section>
 
-      {experiment.jobs.map((job) => (
-        <AdaptationJobCard key={job.id} job={job} />
-      ))}
-
-      <section aria-labelledby="adaptation-comparison-title">
+      <section className="panel" aria-labelledby="adaptation-comparison-title">
         <h2 id="adaptation-comparison-title">
           Comparación de resultados
         </h2>
@@ -92,7 +100,7 @@ export function AdaptationExperimentLive({
 
       </section>
 
-      <section aria-labelledby="adaptation-charts-title">
+      <section className="panel" aria-labelledby="adaptation-charts-title">
         <h2 id="adaptation-charts-title">Curvas de evaluación</h2>
 
         <p>
@@ -114,17 +122,19 @@ export function AdaptationExperimentLive({
 
         {historyReady && hasEvaluations && (
           <Suspense fallback={<p role="status">Cargando gráficas...</p>}>
-            <AdaptationChart
-              jobs={experiment.jobs}
-              history={evaluationHistory}
-              metric="success_rate"
-            />
+            <div className="chart-pair">
+              <AdaptationChart
+                jobs={experiment.jobs}
+                history={evaluationHistory}
+                metric="success_rate"
+              />
 
-            <AdaptationChart
-              jobs={experiment.jobs}
-              history={evaluationHistory}
-              metric="mean_original_reward"
-            />
+              <AdaptationChart
+                jobs={experiment.jobs}
+                history={evaluationHistory}
+                metric="mean_original_reward"
+              />
+            </div>
           </Suspense>
         )}
       </section>

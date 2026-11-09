@@ -45,7 +45,7 @@ export function EvaluationSuccessChart({
           <Bar
             dataKey="percentage"
             name="Porcentaje de episodios"
-            fill="#f59e0b"
+            fill="var(--accent)"
             isAnimationActive={false}
           />
         </BarChart>

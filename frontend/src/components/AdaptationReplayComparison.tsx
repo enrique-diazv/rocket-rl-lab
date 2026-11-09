@@ -42,13 +42,13 @@ export function AdaptationReplayComparison({
   }
 
   return (
-    <section aria-labelledby="adaptation-replays-title">
+    <section className="panel" aria-labelledby="adaptation-replays-title">
       <h2 id="adaptation-replays-title">Replays de adaptación</h2>
 
       {completedJobs.length === 0 ? (
         <p>Todavía no hay agentes con una adaptación finalizada.</p>
       ) : (
-        <>
+        <div className="input-action replay-select">
           <label>
             Agente
             <select
@@ -76,7 +76,7 @@ export function AdaptationReplayComparison({
           >
             {loading ? 'Cargando replays...' : 'Cargar replays'}
           </button>
-        </>
+        </div>
       )}
 
       {error && <p role="alert">{error}</p>}
@@ -90,13 +90,15 @@ export function AdaptationReplayComparison({
             <p>Ambas trayectorias corresponden al mismo checkpoint.</p>
           )}
 
-          <div>
-            <h3>Antes de la adaptación</h3>
-            <EpisodePlayback episode={pair.before} />
-          </div>
-          <div>
-            <h3>Después de la adaptación</h3>
-            <EpisodePlayback episode={pair.after} />
+          <div className="replay-pair">
+            <section>
+              <h3>Antes de la adaptación</h3>
+              <EpisodePlayback episode={pair.before} />
+            </section>
+            <section>
+              <h3>Después de la adaptación</h3>
+              <EpisodePlayback episode={pair.after} />
+            </section>
           </div>
         </>
       )}

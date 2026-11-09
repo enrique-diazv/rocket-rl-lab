@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react'
+import { useState, type ReactNode, type SubmitEvent } from 'react'
 import type { AdaptationExperimentRequest } from '../schemas/adaptation'
 import {
   adaptationScenarioPresets,
@@ -13,12 +13,14 @@ type AdaptationExperimentFormProps = {
   disabled: boolean
   creating: boolean
   onCreate: (config: AdaptationExperimentRequest) => Promise<void>
+  operatorAccess: ReactNode
 }
 
 export function AdaptationExperimentForm({
   disabled,
   creating,
   onCreate,
+  operatorAccess,
 }: AdaptationExperimentFormProps) {
   const [draft, setDraft] = useState<AdaptationScenarioDraft>({
     ...adaptationScenarioPresets.neutral.draft,
@@ -68,40 +70,44 @@ export function AdaptationExperimentForm({
   }
 
   return (
-    <section aria-busy={creating}>
+    <section className="panel command-form" aria-busy={creating}>
       <h2>Nuevo experimento</h2>
       <p>Se creará un trabajo para cada uno de los cinco agentes.</p>
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="adaptation-scenario-preset">
-          Configuración del escenario
-        </label>
+      <form id="adaptation-create-form" onSubmit={handleSubmit}>
+        <div className="scenario-preset">
+          <div>
+            <label htmlFor="adaptation-scenario-preset">
+              Configuración del escenario
+            </label>
 
-        <select
-          id="adaptation-scenario-preset"
-          value={preset}
-          onChange={(event) => handlePresetChange(event.target.value)}
-          disabled={disabled}
-        >
-          {Object.entries(adaptationScenarioPresets).map(
-            ([presetId, definition]) => (
-              <option key={presetId} value={presetId}>
-                {definition.label}
+            <select
+              id="adaptation-scenario-preset"
+              value={preset}
+              onChange={(event) => handlePresetChange(event.target.value)}
+              disabled={disabled}
+            >
+              {Object.entries(adaptationScenarioPresets).map(
+                ([presetId, definition]) => (
+                  <option key={presetId} value={presetId}>
+                    {definition.label}
+                  </option>
+                ),
+              )}
+              <option value="custom" disabled>
+                Personalizado
               </option>
-            ),
-          )}
-          <option value="custom" disabled>
-            Personalizado
-          </option>
-        </select>
+            </select>
+          </div>
 
-        <button
-          type="button"
-          onClick={() => handlePresetChange('neutral')}
-          disabled={disabled}
-        >
-          Restablecer escenario
-        </button>
+          <button
+            type="button"
+            onClick={() => handlePresetChange('neutral')}
+            disabled={disabled}
+          >
+            Restablecer escenario
+          </button>
+        </div>
 
         <AdaptationScenarioFields
           draft={draft}
@@ -118,11 +124,13 @@ export function AdaptationExperimentForm({
         />
 
         {validationError && <p role="alert">{validationError}</p>}
-
-        <button type="submit" disabled={disabled}>
-          {creating ? 'Creando...' : 'Crear experimento'}
-        </button>
       </form>
+
+      {operatorAccess}
+
+      <button className="primary-button" type="submit" form="adaptation-create-form" disabled={disabled}>
+        {creating ? 'Creando...' : 'Crear experimento'}
+      </button>
     </section>
   )
 }

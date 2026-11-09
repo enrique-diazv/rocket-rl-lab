@@ -37,14 +37,19 @@ export function EpisodePlayer({ episodeId, modelId }: EpisodePlayerProps) {
   }
 
   return (
-    <section>
-      <h2>Reproducción del episodio</h2>
+    <section className="panel flight-panel">
+      <header className="panel-heading">
+        <h2>Reproducción del episodio</h2>
 
-      <button type="button" onClick={handleLoadEpisode} disabled={loading}>
-        {loading ? 'Cargando...' : 'Cargar trayectoria'}
-      </button>
+        <button type="button" onClick={handleLoadEpisode} disabled={loading}>
+          {loading ? 'Cargando...' : 'Cargar trayectoria'}
+        </button>
+      </header>
 
       {error && <p role="alert">{error}</p>}
+      {!episode && !error && !loading && (
+        <p>Carga los fotogramas del episodio seleccionado para reproducir el vuelo.</p>
+      )}
       {episode && <EpisodePlayback episode={episode} />}
     </section>
   )

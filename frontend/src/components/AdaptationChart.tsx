@@ -1,6 +1,5 @@
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ReferenceLine,
@@ -20,11 +19,11 @@ const agentStyles: Record<
   AdaptationJob['agent'],
   { stroke: string; dash: string }
 > = {
-  precision: { stroke: '#3b82f6', dash: '' },
-  speed: { stroke: '#ea580c', dash: '4 3' },
-  efficiency: { stroke: '#0d9488', dash: '8 3' },
-  stability: { stroke: '#16a34a', dash: '2 3' },
-  balanced: { stroke: '#a855f7', dash: '12 3' },
+  precision: { stroke: '#ffad64', dash: '' },
+  speed: { stroke: '#d5d7dc', dash: '4 3' },
+  efficiency: { stroke: '#aeb2bb', dash: '8 3' },
+  stability: { stroke: '#edf0f4', dash: '2 3' },
+  balanced: { stroke: '#848a96', dash: '12 3' },
 }
 
 type AdaptationChartProps = {
@@ -59,86 +58,114 @@ export function AdaptationChart({
   )
 
   return (
-    <figure style={{ margin: 0 }}>
+    <figure className="adaptation-chart">
       <figcaption>
         <h3>{title}</h3>
         <p>{description}</p>
       </figcaption>
 
-      <ResponsiveContainer width="100%" height={320} minWidth={0}>
-        <LineChart
-          accessibilityLayer
-          desc={description}
-          margin={{ top: 20, right: 24, bottom: 16, left: 8 }}
-        >
-          <CartesianGrid
-            stroke="var(--border)"
-            strokeDasharray="3 3"
-          />
+      <div className="adaptation-plot">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          <LineChart
+            accessibilityLayer
+            desc={description}
+            margin={{ top: 14, right: 16, bottom: 6, left: 0 }}
+          >
+            <CartesianGrid
+              stroke="var(--border)"
+              strokeDasharray="3 3"
+              vertical={false}
+            />
 
-          <XAxis
-            dataKey="extra_training_timesteps"
-            type="number"
-            domain={[0, maxTimesteps]}
-            allowDecimals={false}
-            allowDuplicatedCategory={false}
-            stroke="var(--text)"
-            minTickGap={32}
-            tickFormatter={(value: number) =>
-              value.toLocaleString('es-MX')
-            }
-          />
+            <XAxis
+              dataKey="extra_training_timesteps"
+              type="number"
+              domain={[0, maxTimesteps]}
+              allowDecimals={false}
+              allowDuplicatedCategory={false}
+              stroke="var(--text)"
+              tickLine={false}
+              minTickGap={32}
+              tickFormatter={(value: number) =>
+                value.toLocaleString('es-MX')
+              }
+            />
 
-          <YAxis
-            width={72}
-            stroke="var(--text)"
-            domain={successMetric ? [0, 1] : ['auto', 'auto']}
-            tickFormatter={(value: number) =>
-              successMetric
-                ? `${Math.round(value * 100)}%`
-                : value.toLocaleString('es-MX')
-            }
-          />
+            <YAxis
+              width={51}
+              stroke="var(--text)"
+              tickLine={false}
+              axisLine={false}
+              domain={successMetric ? [0, 1] : ['auto', 'auto']}
+              tickFormatter={(value: number) =>
+                successMetric
+                  ? `${Math.round(value * 100)}%`
+                  : value.toLocaleString('es-MX')
+              }
+            />
 
-          <Tooltip
-            content={({ active, label }) => (
-              <AdaptationChartTooltip
-                active={active}
-                label={label}
-                jobs={jobs}
-                history={history}
-                metric={metric}
+            <Tooltip
+              content={({ active, label }) => (
+                <AdaptationChartTooltip
+                  active={active}
+                  label={label}
+                  jobs={jobs}
+                  history={history}
+                  metric={metric}
+                />
+              )}
+            />
+
+            {successMetric && (
+              <ReferenceLine
+                y={0.9}
+                label={{
+                  value: 'Umbral 90%',
+                  position: 'insideTopRight',
+                  fill: 'var(--text)',
+                  fontSize: 12,
+                }}
+                stroke="var(--text)"
+                strokeDasharray="5 4"
               />
             )}
-          />
 
-          <Legend />
+            {series.map(({ job, points }) => (
+              <Line
+                key={job.id}
+                data={points}
+                dataKey={metric}
+                name={job.agent}
+                type="linear"
+                stroke={agentStyles[job.agent].stroke}
+                strokeDasharray={agentStyles[job.agent].dash}
+                strokeWidth={2}
+                dot={{ r: 3 }}
+                isAnimationActive={false}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
 
-          {successMetric && (
-            <ReferenceLine
-              y={0.9}
-              label="Umbral: 90%"
-              stroke="var(--text)"
-              strokeDasharray="5 4"
-            />
-          )}
-
-          {series.map(({ job, points }) => (
-            <Line
-              key={job.id}
-              data={points}
-              dataKey={metric}
-              name={job.agent}
-              type="linear"
-              stroke={agentStyles[job.agent].stroke}
-              strokeDasharray={agentStyles[job.agent].dash}
-              strokeWidth={2}
-              dot={{ r: 3 }}
-              isAnimationActive={false}
-            />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+      <ul className="chart-key" aria-label="Agentes en la gráfica">
+        {jobs.map(({ id, agent }) => (
+          <li key={id}>
+            <svg width="26" height="10" viewBox="0 0 26 10" aria-hidden="true">
+              <line
+                x1="0"
+                y1="5"
+                x2="26"
+                y2="5"
+                stroke={agentStyles[agent].stroke}
+                strokeDasharray={agentStyles[agent].dash}
+                strokeWidth="2"
+              />
+            </svg>
+            {agent}
+          </li>
+        ))}
+      </ul>
     </figure>
   )
 }

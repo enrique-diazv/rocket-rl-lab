@@ -50,7 +50,7 @@ export function EvaluationEpisodeChart({
           <Bar
             dataKey={metric}
             name={valueLabel}
-            fill={rewardMetric ? '#38bdf8' : '#a78bfa'}
+            fill={rewardMetric ? 'var(--accent)' : '#aeb2bb'}
             isAnimationActive={false}
           />
         </BarChart>

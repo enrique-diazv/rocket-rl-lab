@@ -10,9 +10,11 @@ export function AdaptationJobCard({ job }: AdaptationJobCardProps) {
   const evaluation = progress?.last_evaluation
 
   return (
-    <article>
+    <article className="agent-job">
       <h3>{job.agent}</h3>
-      <p>Estado: {adaptationStatusLabels[job.status]}</p>
+      <p className="agent-job__status" data-status={job.status}>
+        {adaptationStatusLabels[job.status]}
+      </p>
 
       {progress ? (
         <dl>
@@ -35,7 +37,7 @@ export function AdaptationJobCard({ job }: AdaptationJobCardProps) {
       )}
 
       {evaluation ? (
-        <div>
+        <div className="agent-job__evaluation">
           <h4>Última evaluación</h4>
           <p>Episodios evaluados: {evaluation.episode_count}</p>
           <p>

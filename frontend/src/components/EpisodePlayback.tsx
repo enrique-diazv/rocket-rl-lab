@@ -25,33 +25,37 @@ export function EpisodePlayback({ episode }: EpisodePlaybackProps) {
   }
 
   return (
-    <div>
-      <p>Seed: {episode.seed}</p>
-      <p>Recompensa: {episode.total_reward.toFixed(2)}</p>
-      <p>Pasos: {episode.steps}</p>
-      <p>Fotogramas: {episode.frames.length}</p>
-      <p>Aterrizaje exitoso: {episode.success ? 'Sí' : 'No'}</p>
-
-      <button type="button" onClick={togglePlayback}>
-        {isPlaying ? 'Pausar' : 'Reproducir'}
-      </button>
-
-      <label>
-        Paso: {frameIndex} de {episode.steps}
-        <input
-          type="range"
-          min={0}
-          max={episode.steps}
-          step={1}
-          value={frameIndex}
-          onChange={(event) => {
-            pause()
-            setFrameIndex(Number(event.target.value))
-          }}
-        />
-      </label>
-
+    <div className="flight-playback">
       {frame && <EpisodeCanvas scene={episode.scene} frame={frame} />}
+
+      <div className="flight-transport">
+        <button type="button" onClick={togglePlayback}>
+          {isPlaying ? 'Pausar' : 'Reproducir'}
+        </button>
+
+        <label>
+          Paso {frameIndex} de {episode.steps}
+          <input
+            type="range"
+            min={0}
+            max={episode.steps}
+            step={1}
+            value={frameIndex}
+            onChange={(event) => {
+              pause()
+              setFrameIndex(Number(event.target.value))
+            }}
+          />
+        </label>
+      </div>
+
+      <dl className="flight-stats">
+        <div><dt>Semilla</dt><dd>{episode.seed}</dd></div>
+        <div><dt>Recompensa</dt><dd>{episode.total_reward.toFixed(2)}</dd></div>
+        <div><dt>Pasos</dt><dd>{episode.steps}</dd></div>
+        <div><dt>Fotogramas</dt><dd>{episode.frames.length}</dd></div>
+        <div><dt>Aterrizaje exitoso</dt><dd>{episode.success ? 'Sí' : 'No'}</dd></div>
+      </dl>
     </div>
   )
 }

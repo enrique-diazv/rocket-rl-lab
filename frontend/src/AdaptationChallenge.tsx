@@ -70,30 +70,34 @@ function AdaptationChallenge() {
   }
 
   return (
-    <main>
-      <h1>Desafío de adaptación</h1>
-      <p>
-        Configura un escenario y sigue la adaptación de los cinco agentes.
-      </p>
+    <main className="workspace">
+      <header className="workspace-heading">
+        <div>
+          <h1>Desafío de adaptación</h1>
+          <p>Compara cómo cinco agentes PPO se adaptan al mismo escenario de aterrizaje.</p>
+        </div>
+        <a className="lookup-shortcut" href="#saved-experiment">Consultar un experimento guardado</a>
+      </header>
 
-      <AdaptationAgents />
+      <div className="command-desk">
+        <AdaptationExperimentForm
+          disabled={busy}
+          creating={creating}
+          onCreate={handleCreateExperiment}
+          operatorAccess={
+            <OperatorTokenInput token={operatorToken} onTokenChange={setOperatorToken} />
+          }
+        />
 
-      <OperatorTokenInput
-        token={operatorToken}
-        onTokenChange={setOperatorToken}
-      />
-
-      <AdaptationExperimentForm
-        disabled={busy}
-        creating={creating}
-        onCreate={handleCreateExperiment}
-      />
-
-      <AdaptationExperimentViewer
-        loading={loading}
-        disabled={busy}
-        onLoad={handleLoadExperiment}
-      />
+        <aside className="command-sidebar" aria-label="Consultas de adaptación">
+          <AdaptationExperimentViewer
+            loading={loading}
+            disabled={busy}
+            onLoad={handleLoadExperiment}
+          />
+          <AdaptationAgents />
+        </aside>
+      </div>
 
       {error && <p role="alert">{error}</p>}
 

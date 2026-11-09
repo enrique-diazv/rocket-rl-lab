@@ -30,34 +30,30 @@ export function drawEpisodeFrame(
   frame: FrameSnapshot,
 ): void {
   const { width, height } = context.canvas
+  // El estado inicial de la nave puede quedar por encima del escenario.
+  const scale = Math.min(width / scene.width, height / (scene.height * 1.08))
+  const left = (width - scene.width * scale) / 2
 
   context.save()
   context.setTransform(1, 0, 0, 1, 0, 0)
-  context.fillStyle = '#0b1220'
+  context.fillStyle = '#111214'
   context.fillRect(0, 0, width, height)
 
-  context.setTransform(
-    width / scene.width,
-    0,
-    0,
-    -height / scene.height,
-    0,
-    height,
-  )
-  context.lineWidth = 2 * scene.width / width
-  context.strokeStyle = '#94a3b8'
+  context.setTransform(scale, 0, 0, -scale, left, height)
+  context.lineWidth = 2 / scale
+  context.strokeStyle = '#8b8e95'
 
   for (const segment of scene.terrain) {
     tracePath(context, segment)
     context.stroke()
   }
 
-  context.strokeStyle = '#4ade80'
+  context.strokeStyle = '#ffad64'
   tracePath(context, scene.helipad)
   context.stroke()
 
-  context.strokeStyle = '#f8fafc'
-  context.fillStyle = '#94a3b8'
+  context.strokeStyle = '#f1f2f3'
+  context.fillStyle = '#8b8e95'
 
   for (const leg of frame.legs) {
     tracePath(context, leg, true)
@@ -65,7 +61,7 @@ export function drawEpisodeFrame(
     context.stroke()
   }
 
-  context.fillStyle = '#fb923c'
+  context.fillStyle = '#ffad64'
   tracePath(context, frame.lander, true)
   context.fill()
   context.stroke()

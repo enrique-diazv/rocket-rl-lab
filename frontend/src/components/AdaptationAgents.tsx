@@ -26,7 +26,7 @@ export function AdaptationAgents() {
   }
 
   return (
-    <section aria-labelledby="adaptation-agents-title">
+    <section className="panel agent-catalog" aria-labelledby="adaptation-agents-title">
       <h2 id="adaptation-agents-title">Agentes de adaptación</h2>
 
       <button
@@ -39,6 +39,10 @@ export function AdaptationAgents() {
 
       {error && <p role="alert">{error}</p>}
 
+      {agents === null && !loading && !error && (
+        <p>Consulta cuáles de los cinco agentes tienen un checkpoint disponible.</p>
+      )}
+
       {agents?.length === 0 && (
         <p>No hay agentes disponibles.</p>
       )}
@@ -48,10 +52,9 @@ export function AdaptationAgents() {
           {agents.map((agent) => (
             <li key={agent.id}>
               <strong>{agent.name}</strong>
-              {' — '}
-              {agent.checkpoint_available
-                ? 'Checkpoint disponible'
-                : 'Checkpoint no disponible'}
+              <span>
+                {agent.checkpoint_available ? 'Checkpoint disponible' : 'Checkpoint no disponible'}
+              </span>
             </li>
           ))}
         </ul>

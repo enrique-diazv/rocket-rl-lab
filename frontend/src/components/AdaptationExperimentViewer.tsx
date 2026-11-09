@@ -21,8 +21,9 @@ export function AdaptationExperimentViewer({
   }
 
   return (
-    <section aria-busy={loading}>
+    <section id="saved-experiment" className="panel experiment-lookup" aria-busy={loading} tabIndex={-1}>
       <h2>Consultar experimento</h2>
+      <p>Abre una ejecución guardada con su UUID.</p>
 
       <form onSubmit={handleSubmit}>
         <label htmlFor="adaptation-experiment-id">
