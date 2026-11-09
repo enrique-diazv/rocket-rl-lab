@@ -1,3 +1,4 @@
+import type { AdaptationEvaluationHistory } from '../state/adaptation'
 import type { AdaptationExperiment } from '../schemas/adaptation'
 import {
   useAdaptationEvents,
@@ -16,12 +17,15 @@ const AdaptationChart = lazy(() =>
   })),
 )
 
-const connectionLabels: Record<AdaptationConnectionStatus, string> = {
+type AdaptationReportStatus = AdaptationConnectionStatus | 'recorded'
+
+const connectionLabels: Record<AdaptationReportStatus, string> = {
   connecting: 'Conectando con el progreso...',
   connected: 'Seguimiento en vivo activo.',
   reconnecting: 'Reconectando. Mostrando el último estado recibido.',
   ended: 'Seguimiento finalizado.',
   failed: 'Seguimiento interrumpido.',
+  recorded: 'Experimento grabado.',
 }
 
 type AdaptationExperimentLiveProps = {
@@ -33,13 +37,27 @@ export function AdaptationExperimentLive({
   initialExperiment,
   operatorToken,
 }: AdaptationExperimentLiveProps) {
-  const {
-    experiment,
-    connectionStatus,
-    error,
-    evaluationHistory,
-    historyReady,
-  } = useAdaptationEvents(initialExperiment)
+  const report = useAdaptationEvents(initialExperiment)
+  return <AdaptationExperimentReport {...report} operatorToken={operatorToken} />
+}
+
+type AdaptationExperimentReportProps = {
+  experiment: AdaptationExperiment
+  connectionStatus: AdaptationReportStatus
+  error: string
+  evaluationHistory: AdaptationEvaluationHistory
+  historyReady: boolean
+  operatorToken?: string
+}
+
+export function AdaptationExperimentReport({
+  experiment,
+  connectionStatus,
+  error,
+  evaluationHistory,
+  historyReady,
+  operatorToken,
+}: AdaptationExperimentReportProps) {
 
   const hasEvaluations = experiment.jobs.some(
     (job) => (evaluationHistory[job.id]?.length ?? 0) > 0,
@@ -62,7 +80,8 @@ export function AdaptationExperimentLive({
           pasos.
         </p>
 
-        {!experiment.cancel_requested &&
+        {operatorToken !== undefined &&
+          !experiment.cancel_requested &&
           experiment.jobs.some((job) => job.finished_at === null) && (
             <AdaptationCancelButton
               experimentId={experiment.id}

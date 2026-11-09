@@ -9,6 +9,7 @@ import {
   type AdaptationReplays,
 
 } from '../schemas/adaptation'
+import { demoAssetsPath, staticDemoEnabled } from './demo'
 
 const experimentsPath = '/api/adaptation/experiments'
 
@@ -128,7 +129,9 @@ export async function getAdaptationReplays(
   agent: AdaptationAgent['id'],
 ): Promise<AdaptationReplays> {
   const id = parseExperimentId(experimentId)
-  const path = `${experimentsPath}/${id}/replays/${encodeURIComponent(agent)}`
+  const path = staticDemoEnabled
+    ? `${demoAssetsPath}/${encodeURIComponent(agent)}.json`
+    : `${experimentsPath}/${id}/replays/${encodeURIComponent(agent)}`
   const response = await fetch(path, {
     signal: AbortSignal.timeout(10000),
   })
