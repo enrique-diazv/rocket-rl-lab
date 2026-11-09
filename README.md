@@ -4,6 +4,34 @@ Proyecto educativo de aprendizaje por refuerzo para estudiar cómo el
 diseño de recompensas y los cambios de escenario afectan el aterrizaje
 de agentes PPO en LunarLander-v3.
 
+## Demo pública
+
+[Explorar Rocket RL Lab en Vercel](https://rocket-rl-lab.vercel.app/)
+
+La demo de solo lectura muestra un experimento real en el que cinco agentes
+PPO se evaluaron con las mismas 30 semillas antes y después de 2,048 pasos
+adicionales de entrenamiento. La plataforma tenía la mitad de su ancho
+habitual.
+
+![Comparación de los vuelos de Precision antes y después de la adaptación](docs/demo-replays.jpg)
+
+| Agente | Éxito antes | Éxito después |
+| --- | ---: | ---: |
+| Precision | 63.3% | 53.3% |
+| Speed | 30.0% | 26.7% |
+| Efficiency | 26.7% | 50.0% |
+| Stability | 73.3% | 73.3% |
+| Balanced | 23.3% | 30.0% |
+
+Ningún agente alcanzó el criterio de 90% de éxito en dos evaluaciones
+consecutivas dentro del presupuesto. Cada par de replays muestra una
+trayectoria antes y otra después, con la misma semilla y el mismo escenario.
+
+Vercel compila `frontend` con `npm run build`, publica `dist` y selecciona la
+demo con `VITE_STATIC_DEMO=true`. Las evaluaciones y trayectorias se sirven
+como JSON estático. El entrenamiento, FastAPI y el worker se ejecutan
+localmente en Windows.
+
 ## Entorno de desarrollo
 
 - Windows con PowerShell.
@@ -358,3 +386,5 @@ una sesión incompleta.
 
 Los entornos, dependencias, compilaciones, secretos, checkpoints y
 resultados de experimentos se excluyen mediante .gitignore.
+
+`frontend/public/demo/` contiene la exportación seleccionada para la demo pública.
